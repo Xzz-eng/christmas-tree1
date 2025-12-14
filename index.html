@@ -278,12 +278,20 @@
         }
 
         async function setupWebcam() {
+            // Ensure the canvas is loaded correctly
+            webcamCanvas = document.querySelector("#webcam-preview");
+            if (webcamCanvas instanceof HTMLCanvasElement) {
+                webcamCtx = webcamCanvas.getContext("2d");
+                if (!webcamCtx) {
+                    console.error("Failed to get canvas context!");
+                }
+            } else {
+                console.error("The selected element is not a canvas!");
+            }
+
+            // Set up webcam
             const videoElement = document.querySelector("#webcam");
             video = videoElement;
-            webcamCanvas = document.querySelector("#webcam-preview");
-            webcamCtx = webcamCanvas.getContext("2d");
-            
-            // Use mobile-friendly webcam setup
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             video.srcObject = stream;
         }
