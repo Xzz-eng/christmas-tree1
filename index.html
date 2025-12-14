@@ -1,87 +1,286 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>浪漫圣诞树 · 摄像头测试</title>
-  <style>
-    body{margin:0;background:#0b1020;color:#fff;font-family:-apple-system,Segoe UI,Helvetica,Arial;overflow:hidden}
-    .app{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:100vh}
-    header{padding:12px;text-align:center}
-    .title{font-size:20px;font-weight:bold;color:#ffeaa7}
-    .canvas-wrap{position:relative;width:100%;max-width:480px;aspect-ratio:9/16;margin:8px auto;border-radius:12px;overflow:hidden}
-    canvas{position:absolute;inset:0;width:100%;height:100%}
-    .message-card{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:90%;background:rgba(0,0,0,.5);padding:8px;border-radius:10px;display:flex;gap:8px}
-    .input{flex:1;padding:8px;border-radius:8px;border:none}
-    .btn{padding:8px 12px;border:none;border-radius:8px;background:#ff8fb3;color:#000;font-weight:bold}
-    #videoWrap{margin-top:12px;text-align:center}
-    video{width:90%;max-width:480px;border:2px solid #fff;border-radius:12px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Luxury Tree Final v2</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000000; font-family: 'Times New Roman', serif; }
+        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        /* UI Overlay - Minimalist */
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
+            display: flex; flex-direction: column; 
+            align-items: center;
+            padding-top: 40px;
+            box-sizing: border-box;
+        }
+        
+        /* When hidden class is applied to specific elements */
+        .ui-hidden {
+            opacity: 0;
+            pointer-events: none !important;
+        }
+
+        /* Loading */
+        #loader {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .loader-text {
+            color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px;
+            text-transform: uppercase; font-weight: 100;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 1px solid rgba(212, 175, 55, 0.2); 
+            border-top: 1px solid #d4af37; border-radius: 50%; 
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Typography - Centerpiece */
+        h1 { 
+            color: #fceea7; font-size: 56px; margin: 0; font-weight: 400; 
+            letter-spacing: 6px; 
+            text-shadow: 0 0 50px rgba(252, 238, 167, 0.6); 
+            background: linear-gradient(to bottom, #fff, #eebb66);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Cinzel', 'Times New Roman', serif;
+            opacity: 0.9;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Upload Button - Restored & Elegant */
+        .upload-wrapper {
+            margin-top: 20px;
+            pointer-events: auto;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        .upload-btn {
+            background: rgba(20, 20, 20, 0.6); 
+            border: 1px solid rgba(212, 175, 55, 0.4); 
+            color: #d4af37; 
+            padding: 10px 25px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-size: 10px;
+            transition: all 0.4s;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+        .upload-btn:hover { 
+            background: #d4af37; 
+            color: #000; 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .hint-text {
+            color: rgba(212, 175, 55, 0.5);
+            font-size: 9px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #file-input { display: none; }
+
+        /* Webcam hidden structure */
+        #webcam-wrapper {
+            position: absolute; bottom: 40px; right: 40px;
+            width: 120px; height: 90px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden; opacity: 0; /* Hidden by default but functional */
+            pointer-events: none;
+        }
+    </style>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+    </style>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+                "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/+esm"
+            }
+        }
+    </script>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="title">圣诞树 + 摄像头</div>
-      <p>点击按钮可以在手机上打开摄像头</p>
-    </header>
 
-    <div class="canvas-wrap">
-      <canvas id="stage"></canvas>
-      <div class="message-card">
-        <input id="msg" class="input" placeholder="写一句话放到树心里" />
-        <button class="btn" id="apply">放到树上</button>
-      </div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">Loading Holiday Magic</div>
     </div>
 
-    <div id="videoWrap">
-      <button class="btn" onclick="openCam()">打开摄像头</button><br>
-      <video id="video" autoplay playsinline></video>
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <h1>Merry Christmas</h1>
+        
+        <div class="upload-wrapper">
+            <label class="upload-btn">
+                Add Memories
+                <input type="file" id="file-input" multiple accept="image/*">
+            </label>
+            <div class="hint-text">Press 'H' to Hide Controls</div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // ====== 圣诞树动画（简化版） ======
-    const canvas = document.getElementById('stage');
-    const ctx = canvas.getContext('2d');
-    let W=360,H=640;
-    function fit(){
-      const rect=canvas.parentElement.getBoundingClientRect();
-      W=rect.width;H=rect.height;
-      canvas.width=W;canvas.height=H;
-    }
-    fit();window.addEventListener('resize',fit);
+    <!-- Webcam hidden structure -->
+    <div id="webcam-wrapper">
+        <video id="webcam" autoplay playsinline style="display:none;"></video>
+        <canvas id="webcam-preview"></canvas>
+    </div>
 
-    let message="Merry Christmas";
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle="#135c3a";
-      ctx.beginPath();
-      ctx.moveTo(W/2,H*0.2);
-      ctx.lineTo(W/2-100,H*0.8);
-      ctx.lineTo(W/2+100,H*0.8);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle="#ffd86b";
-      ctx.font="20px sans-serif";
-      ctx.textAlign="center";
-      ctx.fillText(message,W/2,H*0.5);
-      requestAnimationFrame(draw);
-    }
-    draw();
-    document.getElementById('apply').onclick=()=>{
-      const v=document.getElementById('msg').value.trim();
-      if(v) message=v;
-    };
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'; 
+        import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-    // ====== 摄像头调用 ======
-    async function openCam(){
-      try{
-        const stream=await navigator.mediaDevices.getUserMedia({video:true});
-        document.getElementById('video').srcObject=stream;
-      }catch(err){
-        alert("无法访问摄像头: "+err.message);
-      }
-    }
-  </script>
+        const CONFIG = {
+            colors: {
+                bg: 0x000000, 
+                champagneGold: 0xffd966, 
+                deepGreen: 0x03180a,     
+                accentRed: 0x990000,     
+            },
+            particles: {
+                count: 500,     // 减少粒子数量
+                dustCount: 1000,  // 减少尘土粒子
+                treeHeight: 24,  
+                treeRadius: 8    
+            },
+            camera: {
+                z: 50 
+            }
+        };
+
+        const STATE = {
+            mode: 'TREE', 
+            focusIndex: -1, 
+            focusTarget: null,
+            hand: { detected: false, x: 0, y: 0 },
+            rotation: { x: 0, y: 0 } 
+        };
+
+        let scene, camera, renderer, composer;
+        let mainGroup; 
+        let clock = new THREE.Clock();
+        let particleSystem = []; 
+        let photoMeshGroup = new THREE.Group();
+        let handLandmarker, video, webcamCanvas, webcamCtx;
+        let caneTexture; 
+
+        async function init() {
+            initThree();
+            setupEnvironment(); 
+            setupLights();
+            createTextures();
+            createParticles(); 
+            createDust();     
+            createEffects();     
+            await setupWebcam(); 
+            loadModel();   
+            render();
+        }
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5, CONFIG.camera.z);
+            renderer = new THREE.WebGLRenderer({ canvas: document.querySelector("#canvas-container") });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(CONFIG.colors.bg);
+
+            new OrbitControls(camera, renderer.domElement);
+
+            // Optimize for mobile performance
+            const gl = renderer.getContext();
+            gl.getExtension('WEBGL_lose_context');
+        }
+
+        function setupEnvironment() {
+            const environment = new RoomEnvironment();
+            scene.environment = environment;
+        }
+
+        function setupLights() {
+            const ambientLight = new THREE.AmbientLight(CONFIG.colors.champagneGold, 0.5);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(CONFIG.colors.accentRed, 1);
+            directionalLight.position.set(1, 1, 0);
+            scene.add(directionalLight);
+        }
+
+        function createTextures() {
+            caneTexture = new THREE.TextureLoader().load('cane-texture.jpg');
+        }
+
+        function createParticles() {
+            for (let i = 0; i < CONFIG.particles.count; i++) {
+                const geometry = new THREE.SphereGeometry(0.1, 4, 4);
+                const material = new THREE.MeshBasicMaterial({ color: CONFIG.colors.accentRed, emissive: CONFIG.colors.accentRed });
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.set(Math.random() * 50 - 25, Math.random() * 10, Math.random() * 50 - 25);
+                particleSystem.push(particle);
+                scene.add(particle);
+            }
+        }
+
+        function createDust() {
+            // Dust particles configuration
+        }
+
+        function createEffects() {
+            composer = new EffectComposer(renderer);
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight), 
+                1.5, 0.4, 0.85 
+            );
+            composer.addPass(bloomPass);
+        }
+
+        async function setupWebcam() {
+            const videoElement = document.querySelector("#webcam");
+            video = videoElement;
+            webcamCanvas = document.querySelector("#webcam-preview");
+            webcamCtx = webcamCanvas.getContext("2d");
+            
+            // Use mobile-friendly webcam setup
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        function loadModel() {
+            // Load model or other assets
+        }
+
+        function render() {
+            requestAnimationFrame(render);
+            const delta = clock.getDelta();
+            // Update the scene, camera, and effects
+            composer.render();
+        }
+
+        // Start initialization
+        init();
+    </script>
+
 </body>
 </html>
