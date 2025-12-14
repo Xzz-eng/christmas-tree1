@@ -18,6 +18,7 @@
             box-sizing: border-box;
         }
         
+        /* When hidden class is applied to specific elements */
         .ui-hidden {
             opacity: 0;
             pointer-events: none !important;
@@ -40,6 +41,18 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Typography - Centerpiece */
+        h1 { 
+            color: #fceea7; font-size: 56px; margin: 0; font-weight: 400; 
+            letter-spacing: 6px; 
+            text-shadow: 0 0 50px rgba(252, 238, 167, 0.6); 
+            background: linear-gradient(to bottom, #fff, #eebb66);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Cinzel', 'Times New Roman', serif;
+            opacity: 0.9;
+            transition: opacity 0.5s ease;
+        }
 
         /* Upload Button - Restored & Elegant */
         .upload-wrapper {
@@ -138,8 +151,8 @@
                 accentRed: 0x990000,     
             },
             particles: {
-                count: 500,     // 减少粒子数量
-                dustCount: 1000,  // 减少尘土粒子
+                count: 500,     // Reduce the number of particles
+                dustCount: 1000,  // Reduce the number of dust particles
                 treeHeight: 24,  
                 treeRadius: 8    
             },
@@ -164,11 +177,34 @@
         let handLandmarker, video, webcamCanvas, webcamCtx;
         let caneTexture; 
 
-        // 1. 摄像头启动触发器
+        // 1. Webcam start trigger
         document.getElementById('start-webcam').addEventListener('click', async () => {
             await setupWebcam();
             document.getElementById('start-webcam').style.display = 'none'; // Hide the button after clicking
         });
+
+        // 2. Using navigator.userAgentData to detect mobile devices
+        function checkMobile() {
+            if (navigator.userAgentData) {
+                if (navigator.userAgentData.mobile) {
+                    console.log('This is a mobile device.');
+                    return true;
+                } else {
+                    console.log('This is not a mobile device.');
+                    return false;
+                }
+            } else {
+                // Fallback for browsers that do not support navigator.userAgentData
+                const userAgent = navigator.userAgent;
+                if (userAgent.indexOf('Mobile') !== -1) {
+                    console.log('This is a mobile device.');
+                    return true;
+                } else {
+                    console.log('This is not a mobile device.');
+                    return false;
+                }
+            }
+        }
 
         async function init() {
             initThree();
