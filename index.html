@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>3D圣诞树 - 移动版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>3D圣诞树 - iPhone 14 Pro 优化版</title>
     
-    <!-- 引入Three.js和相关库（传统方式） -->
+    <!-- 引入Three.js和相关库（传统方式，兼容性更好） -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/EffectComposer.js"></script>
@@ -14,12 +16,23 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/environments/RoomEnvironment.js"></script>
 
     <style>
-        /* [保留所有CSS样式，与之前相同] */
+        /* iPhone 14 Pro 特定优化 */
+        :root {
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            --dynamic-island-height: 59px; /* iPhone 14 Pro 动态岛高度 */
+            --iphone-14-pro-height: 852px; /* iPhone 14 Pro 逻辑高度 */
+            --iphone-14-pro-width: 393px; /* iPhone 14 Pro 逻辑宽度 */
+        }
+        
         * {
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            box-sizing: border-box;
         }
         
         body { 
@@ -28,9 +41,14 @@
             background-color: #000000; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
             position: fixed;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             touch-action: none;
+            /* iPhone 安全区域处理 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
         
         #canvas-container { 
@@ -40,6 +58,15 @@
             top: 0; 
             left: 0; 
             z-index: 1; 
+            /* 考虑安全区域 */
+            margin-top: calc(env(safe-area-inset-top) * -1);
+            margin-bottom: calc(env(safe-area-inset-bottom) * -1);
+            margin-left: calc(env(safe-area-inset-left) * -1);
+            margin-right: calc(env(safe-area-inset-right) * -1);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
         
         /* 加载界面 */
@@ -47,8 +74,8 @@
             position: absolute; 
             top: 0; 
             left: 0; 
-            width: 100%; 
-            height: 100%;
+            width: 100vw; 
+            height: 100vh;
             background: #000; 
             z-index: 100;
             display: flex; 
@@ -56,11 +83,14 @@
             align-items: center; 
             justify-content: center;
             transition: opacity 0.8s ease-out;
+            /* 安全区域补偿 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .loader-text {
             color: #d4af37; 
-            font-size: clamp(12px, 4vw, 14px); 
+            font-size: 14px; 
             letter-spacing: 2px; 
             margin-top: 20px;
             text-transform: uppercase; 
@@ -88,8 +118,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: #000;
             color: #ff6b6b;
             display: none;
@@ -99,6 +129,8 @@
             z-index: 200;
             text-align: center;
             padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
         }
         
         .error-title {
@@ -128,6 +160,75 @@
         .retry-btn:active {
             background: rgba(212, 175, 55, 0.4);
         }
+        
+        /* iPhone 14 Pro 特定优化 */
+        @media only screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) {
+            /* iPhone 14 Pro 竖屏 */
+            body {
+                padding-top: calc(env(safe-area-inset-top) + 10px); /* 为动态岛留空间 */
+            }
+            
+            h1 {
+                margin-top: calc(5vh + env(safe-area-inset-top));
+                font-size: 40px;
+            }
+            
+            .mobile-controls {
+                bottom: calc(20px + env(safe-area-inset-bottom));
+            }
+        }
+        
+        @media only screen and (device-width: 852px) and (device-height: 393px) and (-webkit-device-pixel-ratio: 3) {
+            /* iPhone 14 Pro 横屏 */
+            h1 {
+                font-size: 32px;
+                margin-top: 5vh;
+            }
+            
+            .upload-wrapper {
+                margin-top: 3vh;
+            }
+            
+            .mobile-controls {
+                bottom: 10px;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+        
+        /* 通用移动端优化 */
+        @media (max-height: 700px) {
+            /* 小屏幕设备 */
+            h1 {
+                margin-top: 5vh;
+                font-size: 32px;
+            }
+            
+            .upload-wrapper {
+                margin-top: 3vh;
+            }
+            
+            .mobile-controls {
+                bottom: 10px;
+            }
+        }
+        
+        /* 动态岛区域处理 */
+        .dynamic-island-area {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: transparent;
+            z-index: 5;
+            pointer-events: none;
+        }
     </style>
     
     <style>
@@ -137,27 +238,26 @@
 <body>
     <div id="loader">
         <div class="spinner"></div>
-        <div class="loader-text">加载中...</div>
+        <div class="loader-text">加载节日魔法...</div>
     </div>
     
     <div class="error-message" id="error-message">
         <div class="error-title">加载失败</div>
         <div class="error-detail" id="error-detail">请检查网络连接后重试</div>
         <button class="retry-btn" onclick="window.location.reload()">重新加载</button>
-        <div class="error-detail" style="margin-top: 30px;">
-            如果多次失败，请尝试：
-        </div>
-        <div class="error-detail" style="font-size: 12px;">
-            1. 切换到WiFi网络<br>
-            2. 清除浏览器缓存<br>
-            3. 更新浏览器版本
-        </div>
     </div>
+
+    <!-- iPhone 14 Pro 动态岛区域（占位用） -->
+    <div class="dynamic-island-area"></div>
 
     <div id="canvas-container"></div>
 
     <script>
-        // 配置
+        // iPhone 14 Pro 检测
+        const isIPhone14Pro = /iPhone 14 Pro/.test(navigator.userAgent) || 
+            (window.screen.width === 393 && window.screen.height === 852 && window.devicePixelRatio === 3);
+        
+        // 配置 - 针对iPhone 14 Pro优化
         const CONFIG = {
             colors: {
                 bg: 0x000000, 
@@ -166,13 +266,13 @@
                 accentRed: 0x990000,     
             },
             particles: {
-                count: window.innerWidth < 768 ? 400 : 600,
-                dustCount: window.innerWidth < 768 ? 800 : 1200,
-                treeHeight: 16,  
-                treeRadius: 4    
+                count: isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600),
+                dustCount: isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200),
+                treeHeight: 14,  
+                treeRadius: 3.5    
             },
             camera: {
-                z: window.innerWidth < 768 ? 25 : 35
+                z: isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35)
             }
         };
 
@@ -189,7 +289,8 @@
             },
             rotation: { x: 0, y: 0 },
             autoRotate: true,
-            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+            isIPhone14Pro: isIPhone14Pro
         };
 
         let scene, camera, renderer, composer;
@@ -198,28 +299,12 @@
         let particleSystem = []; 
         let photoMeshGroup = new THREE.Group();
         let caneTexture;
-        let touchArea;
 
         // 检查Three.js是否加载成功
         function checkThreeLoaded() {
             if (typeof THREE === 'undefined') {
                 showError('Three.js库加载失败，请刷新页面重试');
                 return false;
-            }
-            
-            // 检查需要的模块是否加载
-            const requiredModules = [
-                'EffectComposer',
-                'RenderPass', 
-                'UnrealBloomPass',
-                'RoomEnvironment',
-                'OrbitControls'
-            ];
-            
-            for (const module of requiredModules) {
-                if (typeof THREE[module] === 'undefined' && window[module] === undefined) {
-                    console.warn(`模块 ${module} 未找到，将继续使用基础功能`);
-                }
             }
             
             return true;
@@ -261,6 +346,8 @@
                         loader.style.opacity = 0;
                         setTimeout(() => {
                             loader.style.display = 'none';
+                            // 确保UI元素可见
+                            updateUIPosition();
                         }, 800);
                     }, 1000);
                 }
@@ -280,7 +367,7 @@
             scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.02); 
 
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 3, CONFIG.camera.z); 
+            camera.position.set(0, 2, CONFIG.camera.z); 
 
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
@@ -288,8 +375,15 @@
                 powerPreference: "high-performance",
                 precision: 'mediump'
             });
+            
+            // iPhone 14 Pro 性能优化
+            if (STATE.isIPhone14Pro) {
+                renderer.setPixelRatio(2); // 降低像素比提高性能
+            } else {
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            }
+            
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.toneMapping = THREE.ReinhardToneMapping; 
             renderer.toneMappingExposure = 1.8; 
             renderer.shadowMap.enabled = false;
@@ -301,12 +395,10 @@
 
         function setupEnvironment() {
             try {
-                // 尝试使用RoomEnvironment，如果不可用则跳过
                 if (typeof THREE.RoomEnvironment !== 'undefined') {
                     const pmremGenerator = new THREE.PMREMGenerator(renderer);
                     scene.environment = pmremGenerator.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
                 } else {
-                    // 简单的环境光替代
                     const ambient = new THREE.AmbientLight(0xffffff, 0.8);
                     scene.add(ambient);
                 }
@@ -325,7 +417,7 @@
             innerLight.position.set(0, 4, 0);
             mainGroup.add(innerLight);
 
-            const spotGold = new THREE.SpotLight(0xffcc66, 500);
+            const spotGold = new THREE.SpotLight(0xffcc66, 400);
             spotGold.position.set(10, 20, 20);
             spotGold.angle = 0.3;
             spotGold.penumbra = 0.5;
@@ -333,8 +425,8 @@
         }
 
         function setupPostProcessing() {
-            // 移动端完全禁用后期处理
-            if (window.innerWidth < 768 || typeof THREE.EffectComposer === 'undefined') {
+            // iPhone 14 Pro 完全禁用后期处理以保证性能
+            if (STATE.isIPhone14Pro || window.innerWidth < 768 || typeof THREE.EffectComposer === 'undefined') {
                 return;
             }
             
@@ -342,7 +434,7 @@
                 const renderScene = new THREE.RenderPass(scene, camera);
                 const bloomPass = new THREE.UnrealBloomPass(
                     new THREE.Vector2(window.innerWidth, window.innerHeight), 
-                    1.0, 0.4, 0.8
+                    0.8, 0.4, 0.8
                 );
 
                 composer = new THREE.EffectComposer(renderer);
@@ -355,7 +447,7 @@
 
         function createTextures() {
             const canvas = document.createElement('canvas');
-            canvas.width = 32; // 更小的纹理，移动端更友好
+            canvas.width = 32;
             canvas.height = 32;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#ffffff';
@@ -385,7 +477,7 @@
                 this.posScatter = new THREE.Vector3();
                 this.baseScale = mesh.scale.x; 
 
-                const speedMult = (type === 'PHOTO') ? 0.1 : 1.0;
+                const speedMult = (type === 'PHOTO') ? 0.08 : 0.8;
 
                 this.spinSpeed = new THREE.Vector3(
                     (Math.random() - 0.5) * speedMult,
@@ -404,11 +496,11 @@
                 const y = (t * h) - halfH;
                 let rMax = CONFIG.particles.treeRadius * (1.0 - t); 
                 if (rMax < 0.2) rMax = 0.2;
-                const angle = t * 30 * Math.PI + Math.random() * Math.PI; 
+                const angle = t * 25 * Math.PI + Math.random() * Math.PI; 
                 const r = rMax * (0.8 + Math.random() * 0.4); 
                 this.posTree.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
 
-                let rScatter = this.isDust ? (4 + Math.random()*8) : (3 + Math.random()*6);
+                let rScatter = this.isDust ? (3 + Math.random()*6) : (2 + Math.random()*4);
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
                 this.posScatter.set(
@@ -424,7 +516,7 @@
                 if (mode === 'SCATTER') target = this.posScatter;
                 else if (mode === 'FOCUS') {
                     if (this.mesh === focusTargetMesh) {
-                        const desiredWorldPos = new THREE.Vector3(0, 1.5, 15);
+                        const desiredWorldPos = new THREE.Vector3(0, 1.5, 12);
                         const invMatrix = new THREE.Matrix4().copy(mainGroup.matrixWorld).invert();
                         target = desiredWorldPos.applyMatrix4(invMatrix);
                     } else {
@@ -432,7 +524,7 @@
                     }
                 }
 
-                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 3.0 : 1.2; 
+                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 2.5 : 1.0; 
                 this.mesh.position.lerp(target, lerpSpeed * dt);
 
                 if (mode === 'SCATTER') {
@@ -442,7 +534,7 @@
                 } else if (mode === 'TREE') {
                     this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
                     this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
-                    this.mesh.rotation.y += 0.2 * dt; 
+                    this.mesh.rotation.y += 0.15 * dt; 
                 }
                 
                 if (mode === 'FOCUS' && this.mesh === focusTargetMesh) {
@@ -451,27 +543,27 @@
 
                 let s = this.baseScale;
                 if (this.isDust) {
-                    s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 2 + this.mesh.id));
+                    s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 1.5 + this.mesh.id));
                     if (mode === 'TREE') s = 0; 
                 } else if (mode === 'SCATTER' && this.type === 'PHOTO') {
-                    s = this.baseScale * 1.5; 
+                    s = this.baseScale * 1.3; 
                 } else if (mode === 'FOCUS') {
-                    if (this.mesh === focusTargetMesh) s = 2.5; 
-                    else s = this.baseScale * 0.5; 
+                    if (this.mesh === focusTargetMesh) s = 2.0; 
+                    else s = this.baseScale * 0.4; 
                 }
                 
-                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 2*dt);
+                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 1.5*dt);
             }
         }
 
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.3, 8, 8); // 更少的面数
-            const boxGeo = new THREE.BoxGeometry(0.35, 0.35, 0.35); 
+            const sphereGeo = new THREE.SphereGeometry(0.25, 6, 6); // 更少的面数
+            const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3); 
             
             const goldMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.champagneGold,
-                metalness: 0.7, 
-                roughness: 0.4
+                metalness: 0.6, 
+                roughness: 0.5
             });
 
             const greenMat = new THREE.MeshStandardMaterial({
@@ -481,12 +573,12 @@
 
             const redMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.accentRed,
-                roughness: 0.5
+                roughness: 0.6
             });
             
             const candyMat = new THREE.MeshStandardMaterial({ 
                 map: caneTexture, 
-                roughness: 0.7 
+                roughness: 0.8 
             });
 
             for (let i = 0; i < CONFIG.particles.count; i++) {
@@ -507,7 +599,7 @@
                     type = 'RED';
                 }
 
-                const s = 0.2 + Math.random() * 0.3;
+                const s = 0.15 + Math.random() * 0.25;
                 mesh.scale.set(s,s,s);
                 mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
                 
@@ -515,30 +607,30 @@
                 particleSystem.push(new Particle(mesh, type, false));
             }
 
-            const starGeo = new THREE.OctahedronGeometry(0.8, 0);
+            const starGeo = new THREE.OctahedronGeometry(0.6, 0);
             const starMat = new THREE.MeshStandardMaterial({
                 color: 0xffdd88, 
                 emissive: 0xffaa00, 
-                emissiveIntensity: 0.6
+                emissiveIntensity: 0.5
             });
             const star = new THREE.Mesh(starGeo, starMat);
-            star.position.set(0, CONFIG.particles.treeHeight/2 + 0.6, 0);
+            star.position.set(0, CONFIG.particles.treeHeight/2 + 0.5, 0);
             mainGroup.add(star);
             
             mainGroup.add(photoMeshGroup);
         }
 
         function createDust() {
-            const geo = new THREE.TetrahedronGeometry(0.04, 0);
+            const geo = new THREE.TetrahedronGeometry(0.03, 0);
             const mat = new THREE.MeshBasicMaterial({ 
                 color: 0xffeebb, 
                 transparent: true, 
-                opacity: 0.4 
+                opacity: 0.3 
             });
             
             for(let i=0; i<CONFIG.particles.dustCount; i++) {
                  const mesh = new THREE.Mesh(geo, mat);
-                 mesh.scale.setScalar(0.2 + Math.random());
+                 mesh.scale.setScalar(0.15 + Math.random());
                  mainGroup.add(mesh);
                  particleSystem.push(new Particle(mesh, 'DUST', true));
             }
@@ -546,7 +638,7 @@
 
         function createDefaultPhotos() {
             const canvas = document.createElement('canvas');
-            canvas.width = 128; // 更小的默认纹理
+            canvas.width = 128;
             canvas.height = 128;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#050505'; 
@@ -566,15 +658,15 @@
         }
 
         function addPhotoToScene(texture) {
-            const frameGeo = new THREE.BoxGeometry(1.0, 1.0, 0.02);
+            const frameGeo = new THREE.BoxGeometry(0.9, 0.9, 0.02);
             const frameMat = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.champagneGold, 
-                metalness: 0.7, 
-                roughness: 0.4 
+                metalness: 0.6, 
+                roughness: 0.5 
             });
             const frame = new THREE.Mesh(frameGeo, frameMat);
 
-            const photoGeo = new THREE.PlaneGeometry(0.85, 0.85);
+            const photoGeo = new THREE.PlaneGeometry(0.75, 0.75);
             const photoMat = new THREE.MeshBasicMaterial({ map: texture });
             const photo = new THREE.Mesh(photoGeo, photoMat);
             photo.position.z = 0.015;
@@ -583,7 +675,7 @@
             group.add(frame);
             group.add(photo);
             
-            const s = 0.5;
+            const s = 0.4;
             group.scale.set(s,s,s);
             
             photoMeshGroup.add(group);
@@ -594,7 +686,7 @@
             const files = e.target.files;
             if(!files.length) return;
             
-            const maxPhotos = STATE.isMobile ? 6 : 10;
+            const maxPhotos = STATE.isIPhone14Pro ? 4 : 6;
             if (photoMeshGroup.children.length + files.length > maxPhotos) {
                 alert(`最多可以添加 ${maxPhotos} 张照片\n当前已有 ${photoMeshGroup.children.length} 张`);
                 return;
@@ -602,14 +694,14 @@
             
             let loadedCount = 0;
             Array.from(files).forEach(f => {
-                if (loadedCount >= 3) return; // 一次最多处理3张
+                if (loadedCount >= 2) return; // iPhone 14 Pro 一次最多处理2张
                 
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const size = 128; // 更小的尺寸
+                        const size = 128;
                         canvas.width = size;
                         canvas.height = size;
                         const ctx = canvas.getContext('2d');
@@ -630,26 +722,74 @@
             });
         }
 
+        // 更新UI位置以确保可见
+        function updateUIPosition() {
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            
+            // 计算安全区域
+            const safeAreaTop = window.safeAreaInsets ? window.safeAreaInsets.top : 0;
+            const safeAreaBottom = window.safeAreaInsets ? window.safeAreaInsets.bottom : 0;
+            
+            console.log('视口尺寸:', viewportWidth, 'x', viewportHeight);
+            console.log('安全区域:', safeAreaTop, safeAreaBottom);
+            
+            // 动态调整UI位置
+            const title = document.querySelector('h1');
+            const controls = document.querySelector('.mobile-controls');
+            const uploadWrapper = document.querySelector('.upload-wrapper');
+            
+            if (title) {
+                if (viewportHeight < 700) {
+                    // 小屏幕设备
+                    title.style.marginTop = '3vh';
+                    title.style.fontSize = '28px';
+                } else if (STATE.isIPhone14Pro) {
+                    // iPhone 14 Pro
+                    title.style.marginTop = 'calc(4vh + env(safe-area-inset-top))';
+                }
+            }
+            
+            if (controls) {
+                if (STATE.isIPhone14Pro) {
+                    controls.style.bottom = 'calc(15px + env(safe-area-inset-bottom))';
+                } else if (viewportHeight < 700) {
+                    controls.style.bottom = '10px';
+                } else {
+                    controls.style.bottom = 'calc(20px + env(safe-area-inset-bottom))';
+                }
+                
+                // 确保控制按钮可见
+                controls.style.display = 'flex';
+                controls.style.opacity = '1';
+                controls.style.zIndex = '20';
+            }
+            
+            if (uploadWrapper && viewportHeight < 700) {
+                uploadWrapper.style.marginTop = '2vh';
+            }
+        }
+
         function setupMobileEvents() {
-            // 添加基础UI
+            // 创建UI界面
             const uiHTML = `
                 <div id="ui-layer" style="
-                    position: absolute; 
+                    position: fixed; 
                     top: 0; 
                     left: 0; 
-                    width: 100%; 
-                    height: 100%;
+                    width: 100vw; 
+                    height: 100vh;
                     z-index: 10; 
                     pointer-events: none;
                     display: flex; 
                     flex-direction: column; 
                     align-items: center;
-                    padding-top: 10vh;
+                    padding-top: calc(6vh + env(safe-area-inset-top));
                     box-sizing: border-box;
                 ">
                     <h1 style="
                         color: #fceea7; 
-                        font-size: clamp(28px, 8vw, 40px); 
+                        font-size: ${STATE.isIPhone14Pro ? '36px' : 'clamp(32px, 8vw, 42px)'}; 
                         margin: 0 0 4vh 0; 
                         font-weight: 400; 
                         letter-spacing: 2px; 
@@ -658,14 +798,15 @@
                         -webkit-background-clip: text; 
                         -webkit-text-fill-color: transparent;
                         background-clip: text;
-                        font-family: 'Times New Roman', serif;
+                        font-family: 'Cinzel', 'Times New Roman', serif;
                         opacity: 0.9;
                         text-align: center;
                         padding: 0 15px;
+                        pointer-events: none;
                     ">圣诞快乐</h1>
                     
                     <div class="upload-wrapper" style="
-                        margin-top: 2vh;
+                        margin-top: ${STATE.isIPhone14Pro ? '3vh' : '4vh'};
                         pointer-events: auto;
                         text-align: center;
                         width: 90%;
@@ -684,8 +825,9 @@
                             backdrop-filter: blur(10px);
                             border-radius: 4px;
                             touch-action: manipulation;
-                            min-height: 40px;
+                            min-height: 44px;
                             font-weight: 500;
+                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
                         ">
                             添加照片
                             <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
@@ -698,12 +840,13 @@
                             text-transform: uppercase;
                             text-align: center;
                             padding: 0 10px;
+                            pointer-events: none;
                         ">单指旋转 · 双指缩放</div>
                     </div>
                     
                     <div id="mode-indicator" style="
                         position: absolute;
-                        top: max(20px, env(safe-area-inset-top));
+                        top: calc(15px + env(safe-area-inset-top));
                         right: 15px;
                         background: rgba(0, 0, 0, 0.5);
                         color: #d4af37;
@@ -716,38 +859,98 @@
                         backdrop-filter: blur(10px);
                         border: 1px solid rgba(212, 175, 55, 0.3);
                         font-weight: 500;
+                        z-index: 15;
                     ">🎄 圣诞树模式</div>
-                </div>
-                
-                <div id="touch-area" style="
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 70%;
-                    z-index: 5;
-                    pointer-events: auto;
-                    background: transparent;
-                "></div>
-                
-                <div class="mobile-controls" style="
-                    position: absolute;
-                    bottom: max(15px, env(safe-area-inset-bottom));
-                    left: 0;
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-around;
-                    align-items: center;
-                    pointer-events: auto;
-                    padding: 0 15px;
-                    box-sizing: border-box;
-                ">
-                    <div class="control-btn" id="btn-tree" title="圣诞树模式" style="
+                    
+                    <!-- 触摸区域 -->
+                    <div id="touch-area" style="
+                        position: absolute;
+                        top: calc(100px + env(safe-area-inset-top));
+                        left: 0;
+                        width: 100vw;
+                        height: 60vh;
+                        z-index: 5;
+                        pointer-events: auto;
+                        background: transparent;
+                    "></div>
+                    
+                    <!-- 移动端控制按钮 -->
+                    <div class="mobile-controls" style="
+                        position: fixed;
+                        bottom: calc(20px + env(safe-area-inset-bottom));
+                        left: 0;
+                        width: 100vw;
+                        display: flex;
+                        justify-content: space-around;
+                        align-items: center;
+                        pointer-events: auto;
+                        padding: 0 15px;
+                        box-sizing: border-box;
+                        z-index: 20;
+                    ">
+                        <div class="control-btn" id="btn-tree" title="圣诞树模式" style="
+                            background: rgba(30, 30, 30, 0.7);
+                            border: 1px solid rgba(212, 175, 55, 0.4);
+                            color: #d4af37;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 20px;
+                            cursor: pointer;
+                            touch-action: manipulation;
+                            transition: all 0.3s;
+                            backdrop-filter: blur(10px);
+                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+                        ">🎄</div>
+                        <div class="control-btn" id="btn-scatter" title="星空模式" style="
+                            background: rgba(30, 30, 30, 0.7);
+                            border: 1px solid rgba(212, 175, 55, 0.4);
+                            color: #d4af37;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 20px;
+                            cursor: pointer;
+                            touch-action: manipulation;
+                            transition: all 0.3s;
+                            backdrop-filter: blur(10px);
+                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+                        ">✨</div>
+                        <div class="control-btn" id="btn-focus" title="随机聚焦" style="
+                            background: rgba(30, 30, 30, 0.7);
+                            border: 1px solid rgba(212, 175, 55, 0.4);
+                            color: #d4af37;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 20px;
+                            cursor: pointer;
+                            touch-action: manipulation;
+                            transition: all 0.3s;
+                            backdrop-filter: blur(10px);
+                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+                        ">📸</div>
+                    </div>
+                    
+                    <!-- 隐藏/显示UI按钮 -->
+                    <div class="control-btn" id="btn-toggle-ui" title="显示/隐藏控制" style="
+                        position: fixed;
+                        bottom: calc(85px + env(safe-area-inset-bottom));
+                        right: 20px;
                         background: rgba(30, 30, 30, 0.7);
                         border: 1px solid rgba(212, 175, 55, 0.4);
                         color: #d4af37;
-                        width: 45px;
-                        height: 45px;
+                        width: 40px;
+                        height: 40px;
                         border-radius: 50%;
                         display: flex;
                         align-items: center;
@@ -757,50 +960,25 @@
                         touch-action: manipulation;
                         transition: all 0.3s;
                         backdrop-filter: blur(10px);
-                    ">🎄</div>
-                    <div class="control-btn" id="btn-scatter" title="星空模式" style="
-                        background: rgba(30, 30, 30, 0.7);
-                        border: 1px solid rgba(212, 175, 55, 0.4);
-                        color: #d4af37;
-                        width: 45px;
-                        height: 45px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 18px;
-                        cursor: pointer;
-                        touch-action: manipulation;
-                        transition: all 0.3s;
-                        backdrop-filter: blur(10px);
-                    ">✨</div>
-                    <div class="control-btn" id="btn-focus" title="随机聚焦" style="
-                        background: rgba(30, 30, 30, 0.7);
-                        border: 1px solid rgba(212, 175, 55, 0.4);
-                        color: #d4af37;
-                        width: 45px;
-                        height: 45px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 18px;
-                        cursor: pointer;
-                        touch-action: manipulation;
-                        transition: all 0.3s;
-                        backdrop-filter: blur(10px);
-                    ">📸</div>
+                        z-index: 20;
+                        pointer-events: auto;
+                        -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+                    ">👁️</div>
                 </div>
             `;
             
             document.body.insertAdjacentHTML('beforeend', uiHTML);
             
             // 获取DOM元素
-            touchArea = document.getElementById('touch-area');
+            const touchArea = document.getElementById('touch-area');
             const fileInput = document.getElementById('file-input');
             const btnTree = document.getElementById('btn-tree');
             const btnScatter = document.getElementById('btn-scatter');
             const btnFocus = document.getElementById('btn-focus');
+            const btnToggleUI = document.getElementById('btn-toggle-ui');
+            const uploadWrapper = document.querySelector('.upload-wrapper');
+            const modeIndicator = document.getElementById('mode-indicator');
+            const mobileControls = document.querySelector('.mobile-controls');
             
             // 文件上传
             if (fileInput) {
@@ -831,10 +1009,10 @@
                         const deltaX = e.touches[0].clientX - STATE.touch.lastX;
                         const deltaY = e.touches[0].clientY - STATE.touch.lastY;
                         
-                        STATE.rotation.y += deltaX * 0.006;
-                        STATE.rotation.x += deltaY * 0.003;
+                        STATE.rotation.y += deltaX * 0.005;
+                        STATE.rotation.x += deltaY * 0.0025;
                         
-                        STATE.rotation.x = Math.max(-0.3, Math.min(0.3, STATE.rotation.x));
+                        STATE.rotation.x = Math.max(-0.25, Math.min(0.25, STATE.rotation.x));
                         
                         STATE.touch.lastX = e.touches[0].clientX;
                         STATE.touch.lastY = e.touches[0].clientY;
@@ -848,8 +1026,8 @@
                         
                         camera.position.z = THREE.MathUtils.clamp(
                             camera.position.z / scale, 
-                            10, 
-                            40
+                            8, 
+                            30
                         );
                         
                         STATE.touch.pinchStart = pinchCurrent;
@@ -899,10 +1077,64 @@
                 });
             }
             
+            // 隐藏/显示UI按钮
+            if (btnToggleUI) {
+                let uiHidden = false;
+                btnToggleUI.addEventListener('click', () => {
+                    uiHidden = !uiHidden;
+                    if (uploadWrapper) {
+                        uploadWrapper.style.opacity = uiHidden ? '0' : '1';
+                        uploadWrapper.style.pointerEvents = uiHidden ? 'none' : 'auto';
+                    }
+                    if (modeIndicator) {
+                        modeIndicator.style.opacity = uiHidden ? '0' : '1';
+                    }
+                    if (btnToggleUI) {
+                        btnToggleUI.innerHTML = uiHidden ? '👁️‍🗨️' : '👁️';
+                    }
+                });
+            }
+            
+            // 双击隐藏/显示UI
+            let lastTap = 0;
+            if (touchArea) {
+                touchArea.addEventListener('touchend', (e) => {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 300 && tapLength > 0) {
+                        // 双击切换UI显示
+                        const uploadWrapper = document.querySelector('.upload-wrapper');
+                        const modeIndicator = document.getElementById('mode-indicator');
+                        const mobileControls = document.querySelector('.mobile-controls');
+                        const btnToggleUI = document.getElementById('btn-toggle-ui');
+                        
+                        if (uploadWrapper && modeIndicator && mobileControls && btnToggleUI) {
+                            const isHidden = uploadWrapper.style.opacity === '0';
+                            uploadWrapper.style.opacity = isHidden ? '1' : '0';
+                            uploadWrapper.style.pointerEvents = isHidden ? 'auto' : 'none';
+                            modeIndicator.style.opacity = isHidden ? '1' : '0';
+                            mobileControls.style.opacity = isHidden ? '1' : '0';
+                            mobileControls.style.pointerEvents = isHidden ? 'auto' : 'none';
+                            btnToggleUI.innerHTML = isHidden ? '👁️' : '👁️‍🗨️';
+                        }
+                    }
+                    lastTap = currentTime;
+                });
+            }
+            
             // 窗口大小变化
-            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('resize', function() {
+                setTimeout(() => {
+                    onWindowResize();
+                    updateUIPosition();
+                }, 100);
+            });
+            
             window.addEventListener('orientationchange', function() {
-                setTimeout(onWindowResize, 100);
+                setTimeout(() => {
+                    onWindowResize();
+                    updateUIPosition();
+                }, 500);
             });
         }
 
@@ -933,9 +1165,9 @@
             }
             
             // 更新配置
-            CONFIG.particles.count = window.innerWidth < 768 ? 400 : 600;
-            CONFIG.particles.dustCount = window.innerWidth < 768 ? 800 : 1200;
-            CONFIG.camera.z = window.innerWidth < 768 ? 25 : 35;
+            CONFIG.particles.count = STATE.isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600);
+            CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200);
+            CONFIG.camera.z = STATE.isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35);
         }
 
         function animate() {
@@ -943,7 +1175,7 @@
             const dt = Math.min(clock.getDelta(), 0.033);
 
             if (STATE.autoRotate && STATE.mode === 'TREE') {
-                STATE.rotation.y += 0.12 * dt;
+                STATE.rotation.y += 0.1 * dt;
             }
 
             mainGroup.rotation.y = STATE.rotation.y;
@@ -951,7 +1183,7 @@
 
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
             
-            if (composer) {
+            if (composer && !STATE.isIPhone14Pro && window.innerWidth >= 768) {
                 composer.render();
             } else {
                 renderer.render(scene, camera);
@@ -964,10 +1196,19 @@
             if (loader && loader.style.display !== 'none') {
                 showError('加载时间过长，请检查网络或刷新页面');
             }
-        }, 15000); // 15秒超时
+        }, 15000);
 
         // 页面加载完成后初始化
-        window.addEventListener('load', init);
+        window.addEventListener('load', function() {
+            // 延迟执行以确保安全区域计算正确
+            setTimeout(init, 100);
+            setTimeout(updateUIPosition, 500);
+        });
+        
+        // 监听安全区域变化
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateUIPosition);
+        }
     </script>
 </body>
 </html>
