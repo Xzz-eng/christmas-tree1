@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Grand Luxury Tree Mobile</title>
+    <title>3D圣诞树 - 移动版</title>
     <style>
         * {
             -webkit-tap-highlight-color: transparent;
@@ -16,7 +16,7 @@
             margin: 0; 
             overflow: hidden; 
             background-color: #000000; 
-            font-family: 'Times New Roman', serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
             position: fixed;
             width: 100%;
             height: 100%;
@@ -32,7 +32,7 @@
             z-index: 1; 
         }
         
-        /* UI Overlay - 移动优化 */
+        /* UI样式 */
         #ui-layer {
             position: absolute; 
             top: 0; 
@@ -75,7 +75,7 @@
             letter-spacing: 2px; 
             margin-top: 20px;
             text-transform: uppercase; 
-            font-weight: 100;
+            font-weight: 300;
             text-align: center;
             padding: 0 20px;
         }
@@ -94,11 +94,11 @@
             100% { transform: rotate(360deg); } 
         }
 
-        /* 标题 - 移动端调整 */
+        /* 标题 */
         h1 { 
             color: #fceea7; 
             font-size: clamp(32px, 10vw, 48px); 
-            margin: 20px 0 0 0; 
+            margin: 10vh 0 0 0; 
             font-weight: 400; 
             letter-spacing: 3px; 
             text-shadow: 0 0 30px rgba(252, 238, 167, 0.6); 
@@ -112,9 +112,9 @@
             padding: 0 15px;
         }
 
-        /* 上传按钮 - 移动端优化 */
+        /* 上传按钮 */
         .upload-wrapper {
-            margin-top: 30px;
+            margin-top: 4vh;
             pointer-events: auto;
             text-align: center;
             transition: all 0.5s ease;
@@ -133,10 +133,11 @@
             font-size: clamp(11px, 3vw, 12px);
             transition: all 0.4s;
             display: block;
-            backdrop-filter: blur(5px);
-            border-radius: 2px;
+            backdrop-filter: blur(10px);
+            border-radius: 4px;
             touch-action: manipulation;
-            min-height: 44px; /* 最小触摸目标尺寸 */
+            min-height: 44px;
+            font-weight: 500;
         }
         
         .upload-btn:active { 
@@ -154,6 +155,7 @@
             text-transform: uppercase;
             text-align: center;
             padding: 0 15px;
+            font-weight: 300;
         }
 
         #file-input { 
@@ -163,7 +165,7 @@
         /* 移动端控制面板 */
         .mobile-controls {
             position: absolute;
-            bottom: 20px;
+            bottom: max(20px, env(safe-area-inset-bottom));
             left: 0;
             width: 100%;
             display: flex;
@@ -188,7 +190,7 @@
             cursor: pointer;
             touch-action: manipulation;
             transition: all 0.3s;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
         }
         
         .control-btn:active {
@@ -198,64 +200,122 @@
         
         .mode-indicator {
             position: absolute;
-            top: 20px;
+            top: max(20px, env(safe-area-inset-top));
             right: 20px;
             background: rgba(0, 0, 0, 0.5);
             color: #d4af37;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 12px;
             letter-spacing: 1px;
             text-transform: uppercase;
             pointer-events: none;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(212, 175, 55, 0.3);
+            font-weight: 500;
         }
         
-        /* 触摸反馈区域 */
+        /* 触摸区域 */
         .touch-area {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 70%; /* 顶部70%用于旋转控制 */
+            height: 70%;
             z-index: 5;
             pointer-events: auto;
-            /* 不显示，仅用于捕获触摸 */
             background: transparent;
         }
         
-        /* 底部安全区域（iPhone X等） */
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .mobile-controls {
-                padding-bottom: env(safe-area-inset-bottom);
-            }
+        /* 分享按钮 */
+        .share-btn {
+            position: absolute;
+            bottom: max(20px, env(safe-area-inset-bottom));
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 20;
+        }
+        
+        /* QR码面板 */
+        .qrcode-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .qrcode-content {
+            background: rgba(20,20,20,0.95);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            max-width: 300px;
+            width: 80%;
+            backdrop-filter: blur(20px);
+        }
+        
+        .qrcode-title {
+            color: #d4af37;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .qrcode-url {
+            color: #aaa;
+            font-size: 12px;
+            word-break: break-all;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            margin: 15px 0;
         }
         
         /* 横屏优化 */
         @media (orientation: landscape) {
             h1 {
                 font-size: clamp(28px, 6vw, 40px);
-                margin-top: 10px;
+                margin-top: 5vh;
             }
             
             .upload-wrapper {
-                margin-top: 15px;
+                margin-top: 2vh;
             }
             
             .mobile-controls {
                 bottom: 10px;
             }
-            
-            .control-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
+        }
+        
+        /* 小屏幕优化 */
+        @media (max-width: 320px) {
+            h1 {
+                font-size: 28px;
+                margin-top: 8vh;
             }
             
-            .mode-indicator {
-                top: 10px;
-                right: 10px;
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
             }
         }
     </style>
@@ -268,8 +328,7 @@
         {
             "imports": {
                 "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
-                "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/+esm"
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
             }
         }
     </script>
@@ -277,7 +336,7 @@
 <body>
     <div id="loader">
         <div class="spinner"></div>
-        <div class="loader-text">加载节日魔法</div>
+        <div class="loader-text">加载中...</div>
     </div>
 
     <div id="canvas-container"></div>
@@ -287,35 +346,49 @@
         
         <div class="upload-wrapper">
             <label class="upload-btn">
-                添加回忆
+                添加照片
                 <input type="file" id="file-input" multiple accept="image/*">
             </label>
-            <div class="hint-text">双指缩放 · 触摸旋转</div>
+            <div class="hint-text">双指缩放 · 单指旋转</div>
         </div>
         
-        <div class="mode-indicator" id="mode-indicator">圣诞树</div>
+        <div class="mode-indicator" id="mode-indicator">🎄 圣诞树模式</div>
         
-        <!-- 触摸旋转区域 -->
         <div class="touch-area" id="touch-area"></div>
         
-        <!-- 移动端控制按钮 -->
         <div class="mobile-controls">
-            <div class="control-btn" id="btn-tree">🎄</div>
-            <div class="control-btn" id="btn-scatter">✨</div>
-            <div class="control-btn" id="btn-toggle-ui">👁️</div>
-            <div class="control-btn" id="btn-focus">📸</div>
+            <div class="control-btn" id="btn-tree" title="圣诞树模式">🎄</div>
+            <div class="control-btn" id="btn-scatter" title="星空模式">✨</div>
+            <div class="control-btn" id="btn-toggle-ui" title="显示/隐藏控制">👁️</div>
+            <div class="control-btn" id="btn-focus" title="聚焦照片">📸</div>
+        </div>
+        
+        <div class="share-btn" id="share-btn" title="分享">🔗</div>
+    </div>
+    
+    <!-- QR码弹窗 -->
+    <div class="qrcode-modal" id="qrcode-modal">
+        <div class="qrcode-content">
+            <div class="qrcode-title">手机扫码打开</div>
+            <canvas id="qrCanvas" width="200" height="200"></canvas>
+            <div class="qrcode-url" id="current-url"></div>
+            <button class="upload-btn" onclick="shareLink()" style="margin-top: 10px; width: 100%;">
+                分享链接
+            </button>
+            <button class="upload-btn" onclick="closeQRCode()" style="margin-top: 10px; width: 100%; background: rgba(255,255,255,0.1);">
+                关闭
+            </button>
         </div>
     </div>
 
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-        // --- 移动端配置 ---
+        // 配置
         const CONFIG = {
             colors: {
                 bg: 0x000000, 
@@ -324,13 +397,13 @@
                 accentRed: 0x990000,     
             },
             particles: {
-                count: window.innerWidth < 768 ? 800 : 1200, // 移动端减少粒子数量
-                dustCount: window.innerWidth < 768 ? 1500 : 2000,
-                treeHeight: 20,  
-                treeRadius: 6    
+                count: window.innerWidth < 768 ? 600 : 800,
+                dustCount: window.innerWidth < 768 ? 1000 : 1500,
+                treeHeight: 18,  
+                treeRadius: 5    
             },
             camera: {
-                z: window.innerWidth < 768 ? 35 : 50 // 移动端相机更近
+                z: window.innerWidth < 768 ? 30 : 40
             }
         };
 
@@ -350,7 +423,7 @@
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
         };
 
-        let scene, camera, renderer, composer, controls;
+        let scene, camera, renderer, composer;
         let mainGroup; 
         let clock = new THREE.Clock();
         let particleSystem = []; 
@@ -369,9 +442,12 @@
             setupPostProcessing();
             setupMobileEvents();
             
+            // 隐藏加载界面
             const loader = document.getElementById('loader');
-            loader.style.opacity = 0;
-            setTimeout(() => loader.remove(), 800);
+            setTimeout(() => {
+                loader.style.opacity = 0;
+                setTimeout(() => loader.remove(), 800);
+            }, 500);
 
             updateModeIndicator();
             animate();
@@ -381,7 +457,7 @@
             const container = document.getElementById('canvas-container');
             scene = new THREE.Scene();
             scene.background = new THREE.Color(CONFIG.colors.bg);
-            scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.015); 
+            scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.02); 
 
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 3, CONFIG.camera.z); 
@@ -390,27 +466,14 @@
                 antialias: true, 
                 alpha: false, 
                 powerPreference: "high-performance",
-                precision: 'mediump' // 移动端优化
+                precision: 'mediump'
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // 限制像素比
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.toneMapping = THREE.ReinhardToneMapping; 
-            renderer.toneMappingExposure = 2.0; 
-            renderer.shadowMap.enabled = false; // 移动端禁用阴影
+            renderer.toneMappingExposure = 1.8; 
+            renderer.shadowMap.enabled = false;
             container.appendChild(renderer.domElement);
-
-            // 移动端触摸控制
-            if (STATE.isMobile) {
-                controls = new OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true;
-                controls.dampingFactor = 0.05;
-                controls.enableZoom = true;
-                controls.enablePan = false;
-                controls.minDistance = 20;
-                controls.maxDistance = 60;
-                controls.maxPolarAngle = Math.PI / 2;
-                controls.minPolarAngle = Math.PI / 6;
-            }
 
             mainGroup = new THREE.Group();
             scene.add(mainGroup);
@@ -425,36 +488,29 @@
             const ambient = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambient);
 
-            const innerLight = new THREE.PointLight(0xffaa00, 1.5, 15);
-            innerLight.position.set(0, 5, 0);
+            const innerLight = new THREE.PointLight(0xffaa00, 1.2, 12);
+            innerLight.position.set(0, 4, 0);
             mainGroup.add(innerLight);
 
-            const spotGold = new THREE.SpotLight(0xffcc66, 800);
-            spotGold.position.set(20, 30, 30);
-            spotGold.angle = 0.4;
+            const spotGold = new THREE.SpotLight(0xffcc66, 600);
+            spotGold.position.set(15, 25, 25);
+            spotGold.angle = 0.3;
             spotGold.penumbra = 0.5;
             scene.add(spotGold);
 
-            const fill = new THREE.DirectionalLight(0xffeebb, 0.5);
-            fill.position.set(0, 0, 40);
+            const fill = new THREE.DirectionalLight(0xffeebb, 0.4);
+            fill.position.set(0, 0, 35);
             scene.add(fill);
         }
 
         function setupPostProcessing() {
-            if (window.innerWidth < 768) {
-                // 移动端禁用后期处理或降低质量
-                renderer.render(scene, camera);
-                return;
-            }
+            if (window.innerWidth < 768) return;
             
             const renderScene = new RenderPass(scene, camera);
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight), 
-                1.2, 0.4, 0.85
+                1.0, 0.4, 0.8
             );
-            bloomPass.threshold = 0.7; 
-            bloomPass.strength = 0.4; 
-            bloomPass.radius = 0.3;
 
             composer = new EffectComposer(renderer);
             composer.addPass(renderScene);
@@ -463,7 +519,7 @@
 
         function createTextures() {
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64; // 移动端减小纹理尺寸
+            canvas.width = 64; canvas.height = 64;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0,0,64,64);
@@ -489,8 +545,7 @@
                 this.posScatter = new THREE.Vector3();
                 this.baseScale = mesh.scale.x; 
 
-                // 移动端调整旋转速度
-                const speedMult = (type === 'PHOTO') ? 0.2 : 1.5;
+                const speedMult = (type === 'PHOTO') ? 0.15 : 1.2;
 
                 this.spinSpeed = new THREE.Vector3(
                     (Math.random() - 0.5) * speedMult,
@@ -502,7 +557,6 @@
             }
 
             calculatePositions() {
-                // 圣诞树形态
                 const h = CONFIG.particles.treeHeight;
                 const halfH = h / 2;
                 let t = Math.random(); 
@@ -514,8 +568,7 @@
                 const r = rMax * (0.8 + Math.random() * 0.4); 
                 this.posTree.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
 
-                // 散开形态
-                let rScatter = this.isDust ? (8 + Math.random()*15) : (6 + Math.random()*10);
+                let rScatter = this.isDust ? (6 + Math.random()*12) : (4 + Math.random()*8);
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
                 this.posScatter.set(
@@ -531,7 +584,7 @@
                 if (mode === 'SCATTER') target = this.posScatter;
                 else if (mode === 'FOCUS') {
                     if (this.mesh === focusTargetMesh) {
-                        const desiredWorldPos = new THREE.Vector3(0, 2, 25);
+                        const desiredWorldPos = new THREE.Vector3(0, 1.5, 20);
                         const invMatrix = new THREE.Matrix4().copy(mainGroup.matrixWorld).invert();
                         target = desiredWorldPos.applyMatrix4(invMatrix);
                     } else {
@@ -539,10 +592,9 @@
                     }
                 }
 
-                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 4.0 : 1.8; 
+                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 3.5 : 1.5; 
                 this.mesh.position.lerp(target, lerpSpeed * dt);
 
-                // 旋转逻辑
                 if (mode === 'SCATTER') {
                     this.mesh.rotation.x += this.spinSpeed.x * dt;
                     this.mesh.rotation.y += this.spinSpeed.y * dt;
@@ -550,60 +602,56 @@
                 } else if (mode === 'TREE') {
                     this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
                     this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
-                    this.mesh.rotation.y += 0.3 * dt; 
+                    this.mesh.rotation.y += 0.25 * dt; 
                 }
                 
                 if (mode === 'FOCUS' && this.mesh === focusTargetMesh) {
                     this.mesh.lookAt(camera.position); 
                 }
 
-                // 缩放逻辑
                 let s = this.baseScale;
                 if (this.isDust) {
-                    s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 3 + this.mesh.id));
+                    s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 2.5 + this.mesh.id));
                     if (mode === 'TREE') s = 0; 
                 } else if (mode === 'SCATTER' && this.type === 'PHOTO') {
-                    s = this.baseScale * 2.0; 
+                    s = this.baseScale * 1.8; 
                 } else if (mode === 'FOCUS') {
-                    if (this.mesh === focusTargetMesh) s = 3.5; 
-                    else s = this.baseScale * 0.7; 
+                    if (this.mesh === focusTargetMesh) s = 3.0; 
+                    else s = this.baseScale * 0.6; 
                 }
                 
-                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 3*dt);
+                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 2.5*dt);
             }
         }
 
-        // --- 创建粒子 ---
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.4, 16, 16); // 减少面数
-            const boxGeo = new THREE.BoxGeometry(0.45, 0.45, 0.45); 
+            const sphereGeo = new THREE.SphereGeometry(0.35, 12, 12);
+            const boxGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4); 
             const curve = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(0, -0.4, 0), new THREE.Vector3(0, 0.2, 0),
-                new THREE.Vector3(0.08, 0.4, 0), new THREE.Vector3(0.2, 0.3, 0)
+                new THREE.Vector3(0, -0.3, 0), new THREE.Vector3(0, 0.15, 0),
+                new THREE.Vector3(0.06, 0.3, 0), new THREE.Vector3(0.15, 0.25, 0)
             ]);
-            const candyGeo = new THREE.TubeGeometry(curve, 12, 0.06, 6, false);
+            const candyGeo = new THREE.TubeGeometry(curve, 10, 0.05, 5, false);
 
             const goldMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.champagneGold,
-                metalness: 0.9, roughness: 0.2,
-                envMapIntensity: 1.8
+                metalness: 0.8, roughness: 0.3,
+                envMapIntensity: 1.5
             });
 
             const greenMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.deepGreen,
-                metalness: 0.1, roughness: 0.9,
-                emissive: 0x001100,
-                emissiveIntensity: 0.1 
+                metalness: 0.1, roughness: 0.9
             });
 
             const redMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.accentRed,
-                metalness: 0.2, roughness: 0.3
+                metalness: 0.15, roughness: 0.4
             });
             
             const candyMat = new THREE.MeshStandardMaterial({ 
                 map: caneTexture, 
-                roughness: 0.5 
+                roughness: 0.6 
             });
 
             for (let i = 0; i < CONFIG.particles.count; i++) {
@@ -627,7 +675,7 @@
                     type = 'CANE';
                 }
 
-                const s = 0.3 + Math.random() * 0.4;
+                const s = 0.25 + Math.random() * 0.35;
                 mesh.scale.set(s,s,s);
                 mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
                 
@@ -635,29 +683,29 @@
                 particleSystem.push(new Particle(mesh, type, false));
             }
 
-            const starGeo = new THREE.OctahedronGeometry(1.0, 0);
+            const starGeo = new THREE.OctahedronGeometry(0.9, 0);
             const starMat = new THREE.MeshStandardMaterial({
-                color: 0xffdd88, emissive: 0xffaa00, emissiveIntensity: 0.8,
-                metalness: 0.9, roughness: 0.1
+                color: 0xffdd88, emissive: 0xffaa00, emissiveIntensity: 0.7,
+                metalness: 0.8, roughness: 0.2
             });
             const star = new THREE.Mesh(starGeo, starMat);
-            star.position.set(0, CONFIG.particles.treeHeight/2 + 1.0, 0);
+            star.position.set(0, CONFIG.particles.treeHeight/2 + 0.8, 0);
             mainGroup.add(star);
             
             mainGroup.add(photoMeshGroup);
         }
 
         function createDust() {
-            const geo = new THREE.TetrahedronGeometry(0.06, 0);
+            const geo = new THREE.TetrahedronGeometry(0.05, 0);
             const mat = new THREE.MeshBasicMaterial({ 
                 color: 0xffeebb, 
                 transparent: true, 
-                opacity: 0.6 
+                opacity: 0.5 
             });
             
             for(let i=0; i<CONFIG.particles.dustCount; i++) {
                  const mesh = new THREE.Mesh(geo, mat);
-                 mesh.scale.setScalar(0.4 + Math.random());
+                 mesh.scale.setScalar(0.3 + Math.random());
                  mainGroup.add(mesh);
                  particleSystem.push(new Particle(mesh, 'DUST', true));
             }
@@ -665,18 +713,18 @@
 
         function createDefaultPhotos() {
             const canvas = document.createElement('canvas');
-            canvas.width = 256; canvas.height = 256; // 减小尺寸
+            canvas.width = 256; canvas.height = 256;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#050505'; 
             ctx.fillRect(0,0,256,256);
             ctx.strokeStyle = '#eebb66'; 
-            ctx.lineWidth = 8; 
-            ctx.strokeRect(10,10,236,236);
-            ctx.font = '400 30px Times New Roman'; 
+            ctx.lineWidth = 6; 
+            ctx.strokeRect(8,8,240,240);
+            ctx.font = '400 28px "Times New Roman"'; 
             ctx.fillStyle = '#eebb66';
             ctx.textAlign = 'center'; 
-            ctx.fillText("JOYEUX", 128, 110);
-            ctx.fillText("NOEL", 128, 150);
+            ctx.fillText("Merry", 128, 110);
+            ctx.fillText("Christmas", 128, 150);
             
             const tex = new THREE.CanvasTexture(canvas);
             tex.colorSpace = THREE.SRGBColorSpace;
@@ -684,24 +732,24 @@
         }
 
         function addPhotoToScene(texture) {
-            const frameGeo = new THREE.BoxGeometry(1.2, 1.2, 0.04);
+            const frameGeo = new THREE.BoxGeometry(1.1, 1.1, 0.03);
             const frameMat = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.champagneGold, 
-                metalness: 0.9, 
-                roughness: 0.2 
+                metalness: 0.8, 
+                roughness: 0.3 
             });
             const frame = new THREE.Mesh(frameGeo, frameMat);
 
-            const photoGeo = new THREE.PlaneGeometry(1.0, 1.0);
+            const photoGeo = new THREE.PlaneGeometry(0.95, 0.95);
             const photoMat = new THREE.MeshBasicMaterial({ map: texture });
             const photo = new THREE.Mesh(photoGeo, photoMat);
-            photo.position.z = 0.03;
+            photo.position.z = 0.025;
 
             const group = new THREE.Group();
             group.add(frame);
             group.add(photo);
             
-            const s = 0.7;
+            const s = 0.6;
             group.scale.set(s,s,s);
             
             photoMeshGroup.add(group);
@@ -712,26 +760,26 @@
             const files = e.target.files;
             if(!files.length) return;
             
-            // 限制上传数量
-            const maxPhotos = STATE.isMobile ? 6 : 12;
+            const maxPhotos = STATE.isMobile ? 8 : 15;
             if (photoMeshGroup.children.length + files.length > maxPhotos) {
-                alert(`移动端建议最多上传${maxPhotos}张照片`);
+                alert(`最多可以添加 ${maxPhotos} 张照片\n当前已有 ${photoMeshGroup.children.length} 张`);
                 return;
             }
             
+            let loadedCount = 0;
             Array.from(files).forEach(f => {
+                if (loadedCount >= 5) return; // 一次最多处理5张
+                
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const img = new Image();
                     img.onload = function() {
-                        // 创建缩略图
                         const canvas = document.createElement('canvas');
                         const size = 256;
                         canvas.width = size;
                         canvas.height = size;
                         const ctx = canvas.getContext('2d');
                         
-                        // 计算裁切和缩放
                         const scale = Math.max(size/img.width, size/img.height);
                         const x = (size - img.width * scale) / 2;
                         const y = (size - img.height * scale) / 2;
@@ -740,19 +788,19 @@
                         const tex = new THREE.CanvasTexture(canvas);
                         tex.colorSpace = THREE.SRGBColorSpace;
                         addPhotoToScene(tex);
+                        loadedCount++;
                     };
                     img.src = ev.target.result;
-                }
+                };
                 reader.readAsDataURL(f);
             });
         }
 
-        // --- 移动端触摸事件 ---
+        // 移动端事件处理
         function setupMobileEvents() {
-            // 触摸区域
             touchArea = document.getElementById('touch-area');
             
-            // 触摸旋转
+            // 触摸事件
             touchArea.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 if (e.touches.length === 1) {
@@ -775,10 +823,10 @@
                     const deltaX = e.touches[0].clientX - STATE.touch.lastX;
                     const deltaY = e.touches[0].clientY - STATE.touch.lastY;
                     
-                    STATE.rotation.y += deltaX * 0.01;
-                    STATE.rotation.x += deltaY * 0.005;
+                    STATE.rotation.y += deltaX * 0.008;
+                    STATE.rotation.x += deltaY * 0.004;
                     
-                    STATE.rotation.x = Math.max(-0.5, Math.min(0.5, STATE.rotation.x));
+                    STATE.rotation.x = Math.max(-0.4, Math.min(0.4, STATE.rotation.x));
                     
                     STATE.touch.lastX = e.touches[0].clientX;
                     STATE.touch.lastY = e.touches[0].clientY;
@@ -790,11 +838,10 @@
                     const pinchCurrent = Math.sqrt(dx * dx + dy * dy);
                     const scale = pinchCurrent / STATE.touch.pinchStart;
                     
-                    // 缩放相机
                     camera.position.z = THREE.MathUtils.clamp(
                         camera.position.z / scale, 
-                        20, 
-                        60
+                        15, 
+                        50
                     );
                     
                     STATE.touch.pinchStart = pinchCurrent;
@@ -804,13 +851,10 @@
             touchArea.addEventListener('touchend', (e) => {
                 STATE.touch.isTouching = false;
                 STATE.touch.isPinching = false;
-                if (e.touches.length === 0) {
-                    // 触摸结束后恢复自动旋转（仅在TREE模式）
-                    if (STATE.mode === 'TREE') {
-                        setTimeout(() => {
-                            STATE.autoRotate = true;
-                        }, 1000);
-                    }
+                if (e.touches.length === 0 && STATE.mode === 'TREE') {
+                    setTimeout(() => {
+                        STATE.autoRotate = true;
+                    }, 1500);
                 }
             });
 
@@ -833,7 +877,8 @@
                 const photos = particleSystem.filter(p => p.type === 'PHOTO');
                 if (photos.length > 0) {
                     STATE.mode = 'FOCUS';
-                    STATE.focusTarget = photos[Math.floor(Math.random() * photos.length)].mesh;
+                    const randomIndex = Math.floor(Math.random() * photos.length);
+                    STATE.focusTarget = photos[randomIndex].mesh;
                     STATE.autoRotate = false;
                     updateModeIndicator();
                 }
@@ -842,19 +887,26 @@
             document.getElementById('btn-toggle-ui').addEventListener('click', () => {
                 const controls = document.querySelector('.upload-wrapper');
                 const indicator = document.getElementById('mode-indicator');
-                if (controls && indicator) {
+                const mobileControls = document.querySelector('.mobile-controls');
+                if (controls && indicator && mobileControls) {
                     controls.classList.toggle('ui-hidden');
                     indicator.classList.toggle('ui-hidden');
+                    mobileControls.classList.toggle('ui-hidden');
                 }
             });
 
+            // 分享按钮
+            document.getElementById('share-btn').addEventListener('click', showQRCode);
+
+            // 文件上传
+            document.getElementById('file-input').addEventListener('change', handleImageUpload);
+            
             // 双击隐藏/显示UI
             let lastTap = 0;
             touchArea.addEventListener('touchend', (e) => {
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTap;
                 if (tapLength < 300 && tapLength > 0) {
-                    // 双击
                     const controls = document.querySelector('.upload-wrapper');
                     const indicator = document.getElementById('mode-indicator');
                     const mobileControls = document.querySelector('.mobile-controls');
@@ -868,12 +920,11 @@
                 lastTap = currentTime;
             });
 
-            // 文件上传
-            document.getElementById('file-input').addEventListener('change', handleImageUpload);
-            
             // 窗口大小变化
             window.addEventListener('resize', onWindowResize);
-            window.addEventListener('orientationchange', onWindowResize);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(onWindowResize, 100);
+            });
         }
 
         function updateModeIndicator() {
@@ -882,13 +933,13 @@
             
             switch(STATE.mode) {
                 case 'TREE':
-                    indicator.textContent = '圣诞树';
+                    indicator.textContent = '🎄 圣诞树模式';
                     break;
                 case 'SCATTER':
-                    indicator.textContent = '星空';
+                    indicator.textContent = '✨ 星空模式';
                     break;
                 case 'FOCUS':
-                    indicator.textContent = '聚焦回忆';
+                    indicator.textContent = '📸 聚焦照片';
                     break;
             }
         }
@@ -902,36 +953,25 @@
                 composer.setSize(window.innerWidth, window.innerHeight);
             }
             
-            // 更新配置中的粒子数量
-            CONFIG.particles.count = window.innerWidth < 768 ? 800 : 1200;
-            CONFIG.particles.dustCount = window.innerWidth < 768 ? 1500 : 2000;
-            CONFIG.camera.z = window.innerWidth < 768 ? 35 : 50;
+            // 更新配置
+            CONFIG.particles.count = window.innerWidth < 768 ? 600 : 800;
+            CONFIG.particles.dustCount = window.innerWidth < 768 ? 1000 : 1500;
+            CONFIG.camera.z = window.innerWidth < 768 ? 30 : 40;
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            const dt = Math.min(clock.getDelta(), 0.033); // 限制帧时间
+            const dt = Math.min(clock.getDelta(), 0.033);
 
-            // 自动旋转逻辑
             if (STATE.autoRotate && STATE.mode === 'TREE') {
-                STATE.rotation.y += 0.2 * dt;
+                STATE.rotation.y += 0.15 * dt;
             }
 
-            // 更新旋转
-            if (!STATE.isMobile) {
-                mainGroup.rotation.y = STATE.rotation.y;
-                mainGroup.rotation.x = STATE.rotation.x;
-            }
+            mainGroup.rotation.y = STATE.rotation.y;
+            mainGroup.rotation.x = STATE.rotation.x;
 
-            // 更新粒子
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
             
-            // 更新OrbitControls
-            if (controls) {
-                controls.update();
-            }
-            
-            // 渲染
             if (composer && window.innerWidth >= 768) {
                 composer.render();
             } else {
@@ -939,15 +979,86 @@
             }
         }
 
-        // 性能优化：降低粒子更新频率
-        setInterval(() => {
-            if (document.hidden) {
-                // 页面不可见时暂停动画
-                return;
-            }
-        }, 100);
+        // QR码功能
+        function showQRCode() {
+            const modal = document.getElementById('qrcode-modal');
+            const url = window.location.href;
+            document.getElementById('current-url').textContent = url;
+            
+            // 生成QR码
+            const canvas = document.getElementById('qrCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 简单的QR码实现
+            generateSimpleQRCode(url, canvas);
+            
+            modal.style.display = 'flex';
+        }
 
-        // 开始加载
+        function closeQRCode() {
+            document.getElementById('qrcode-modal').style.display = 'none';
+        }
+
+        function generateSimpleQRCode(text, canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = 200;
+            
+            // 创建简单模式QR码（简化版）
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 画定位标志
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(20, 20, 40, 40);
+            ctx.fillRect(20, 20, 35, 35);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(25, 25, 30, 30);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(30, 30, 20, 20);
+            
+            // 右上角
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(140, 20, 40, 40);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(145, 25, 30, 30);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(150, 30, 20, 20);
+            
+            // 左下角
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(20, 140, 40, 40);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(25, 145, 30, 30);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(30, 150, 20, 20);
+            
+            // 添加文字
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('3D Christmas Tree', size/2, size - 10);
+        }
+
+        function shareLink() {
+            const url = window.location.href;
+            
+            if (navigator.share) {
+                // 使用Web Share API
+                navigator.share({
+                    title: '3D圣诞树',
+                    text: '来看看我的3D互动圣诞树！',
+                    url: url
+                });
+            } else {
+                // 复制到剪贴板
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('链接已复制到剪贴板！\n' + url);
+                });
+            }
+        }
+
+        // 开始
         init();
     </script>
 </body>
