@@ -7,16 +7,15 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>圣诞烟花</title>
     
-    <!-- 引入Three.js和相关库 -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/FilmPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/GlitchPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/environments/RoomEnvironment.js"></script>
+    <!-- 使用可靠的Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- 加载后处理库 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
 
     <style>
         /* iPhone 14 Pro 特定优化 */
@@ -325,7 +324,7 @@
     <div id="canvas-container"></div>
 
     <script>
-        // iPhone 14 Pro 检测
+        // 检测设备
         const isIPhone14Pro = /iPhone 14 Pro/.test(navigator.userAgent) || 
             (window.screen.width === 393 && window.screen.height === 852 && window.devicePixelRatio === 3);
         
@@ -349,10 +348,9 @@
                 fireworkPurple: 0xcc66ff
             },
             particles: {
-                count: isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600),
-                dustCount: isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200),
-                starCount: isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600),
-                fireworkCount: 50,
+                count: isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400),
+                dustCount: isIPhone14Pro ? 400 : (window.innerWidth < 768 ? 600 : 800),
+                starCount: isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400),
                 treeHeight: 14,  
                 treeRadius: 3.5    
             },
@@ -397,14 +395,30 @@
         let photoMeshGroup = new THREE.Group();
         let caneTexture;
         let starPoints;
-        let fireworkParticles = [];
-        let bloomPass, filmPass;
+        let bloomPass;
 
         // 检查Three.js是否加载成功
         function checkThreeLoaded() {
             if (typeof THREE === 'undefined') {
                 showError('Three.js库加载失败，请刷新页面重试');
                 return false;
+            }
+            
+            // 检查必要组件
+            const requiredComponents = [
+                'Scene', 'PerspectiveCamera', 'WebGLRenderer', 'Color',
+                'Group', 'Clock', 'Vector3', 'Matrix4',
+                'SphereGeometry', 'BoxGeometry', 'Mesh', 'MeshStandardMaterial',
+                'AmbientLight', 'PointLight', 'SpotLight',
+                'FogExp2', 'MathUtils'
+            ];
+            
+            for (const component of requiredComponents) {
+                if (!THREE[component]) {
+                    console.error('缺少Three.js组件:', component);
+                    showError('Three.js库加载不完整，请刷新页面重试');
+                    return false;
+                }
             }
             
             return true;
@@ -420,24 +434,41 @@
                 errorDetail.textContent = message;
                 errorDiv.style.display = 'flex';
             }
+            
+            console.error('错误详情:', message);
         }
 
+        // 初始化函数
         async function init() {
+            console.log('开始初始化...');
+            
             // 检查Three.js是否加载成功
             if (!checkThreeLoaded()) {
+                console.error('Three.js检查失败');
                 return;
             }
             
             try {
+                console.log('正在初始化Three.js...');
                 initThree();
+                
+                console.log('正在设置环境...');
                 setupEnvironment(); 
                 setupLights();
+                
+                console.log('正在创建纹理...');
                 createTextures();
+                
+                console.log('正在创建粒子...');
                 createParticles(); 
                 createDust();     
                 createStarParticles();
                 createDefaultPhotos();
+                
+                console.log('正在设置后期处理...');
                 setupPostProcessing();
+                
+                console.log('正在设置触摸事件...');
                 setupTouchEvents();
                 
                 // 隐藏加载界面
@@ -450,34 +481,40 @@
                             // 显示提示文字
                             showHint('单击：烟花模式 · 双击：圣诞树 · 三击：聚焦照片');
                         }, 800);
-                    }, 1000);
+                    }, 500);
                 }
 
                 updateModeIndicator();
                 animate();
+                
+                console.log('初始化完成！');
             } catch (error) {
-                console.error('初始化错误:', error);
-                showError('初始化失败: ' + error.message);
+                console.error('初始化错误详情:', error);
+                showError('初始化失败: ' + (error.message || '未知错误'));
             }
         }
 
         function initThree() {
+            console.log('初始化Three.js场景...');
             const container = document.getElementById('canvas-container');
+            
+            // 创建场景
             scene = new THREE.Scene();
             scene.background = new THREE.Color(CONFIG.colors.bg);
             scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.02); 
 
+            // 创建相机
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 2, CONFIG.camera.z); 
 
+            // 创建渲染器
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
                 alpha: false, 
-                powerPreference: "high-performance",
-                precision: 'mediump'
+                powerPreference: "high-performance"
             });
             
-            // iPhone 14 Pro 性能优化
+            // 性能优化
             if (STATE.isIPhone14Pro) {
                 renderer.setPixelRatio(2);
             } else {
@@ -488,22 +525,20 @@
             renderer.toneMapping = THREE.ACESFilmicToneMapping; 
             renderer.toneMappingExposure = 1.2; 
             renderer.shadowMap.enabled = false;
-            renderer.outputColorSpace = THREE.SRGBColorSpace;
             container.appendChild(renderer.domElement);
 
             mainGroup = new THREE.Group();
             scene.add(mainGroup);
+            
+            console.log('Three.js场景创建完成');
         }
 
         function setupEnvironment() {
+            console.log('设置环境...');
             try {
-                if (typeof THREE.RoomEnvironment !== 'undefined') {
-                    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-                    scene.environment = pmremGenerator.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
-                } else {
-                    const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-                    scene.add(ambient);
-                }
+                // 添加环境光
+                const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+                scene.add(ambient);
             } catch (error) {
                 console.warn('环境设置失败，使用简单环境光:', error);
                 const ambient = new THREE.AmbientLight(0xffffff, 0.8);
@@ -512,6 +547,8 @@
         }
 
         function setupLights() {
+            console.log('设置灯光...');
+            
             const ambient = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambient);
 
@@ -541,13 +578,23 @@
         }
 
         function setupPostProcessing() {
+            console.log('设置后期处理...');
+            
             // iPhone 14 Pro 降低后期处理效果
             if (STATE.isIPhone14Pro) {
+                console.log('iPhone 14 Pro，使用简单渲染');
                 setupSimplePostProcessing();
                 return;
             }
             
             try {
+                // 检查必要的后处理组件
+                if (!THREE.EffectComposer || !THREE.RenderPass || !THREE.UnrealBloomPass) {
+                    console.warn('后处理库未完全加载，使用简单渲染');
+                    setupSimplePostProcessing();
+                    return;
+                }
+                
                 const renderScene = new THREE.RenderPass(scene, camera);
                 
                 // 增强辉光效果 - 让烟花更加绚丽
@@ -558,13 +605,11 @@
                     CONFIG.effects.bloomThreshold
                 );
                 
-                // 添加胶片颗粒效果，增强视觉质感
-                filmPass = new THREE.FilmPass(0.2, 0.5, 648, false);
-                
                 composer = new THREE.EffectComposer(renderer);
                 composer.addPass(renderScene);
                 composer.addPass(bloomPass);
-                composer.addPass(filmPass);
+                
+                console.log('后期处理设置完成');
             } catch (error) {
                 console.warn('后期处理设置失败，使用简单渲染:', error);
                 setupSimplePostProcessing();
@@ -572,11 +617,13 @@
         }
 
         function setupSimplePostProcessing() {
-            // 简单渲染，无后期处理
+            console.log('使用简单渲染');
             composer = null;
         }
 
         function createTextures() {
+            console.log('创建纹理...');
+            
             // 创建拐杖糖纹理
             const canvas = document.createElement('canvas');
             canvas.width = 64;
@@ -597,104 +644,6 @@
             caneTexture.wrapS = THREE.RepeatWrapping;
             caneTexture.wrapT = THREE.RepeatWrapping;
             caneTexture.repeat.set(1, 1);
-        }
-
-        class FireworkParticle {
-            constructor() {
-                this.reset();
-                this.initMesh();
-            }
-
-            reset() {
-                // 初始位置在随机位置
-                this.position = new THREE.Vector3(
-                    (Math.random() - 0.5) * 20,
-                    Math.random() * 5,
-                    (Math.random() - 0.5) * 20
-                );
-                
-                // 初始速度
-                this.velocity = new THREE.Vector3(
-                    (Math.random() - 0.5) * 4,
-                    (Math.random() - 0.5) * 4,
-                    (Math.random() - 0.5) * 4
-                );
-                
-                // 颜色
-                const colors = [
-                    CONFIG.colors.fireworkRed,
-                    CONFIG.colors.fireworkOrange,
-                    CONFIG.colors.fireworkYellow,
-                    CONFIG.colors.fireworkGreen,
-                    CONFIG.colors.fireworkBlue,
-                    CONFIG.colors.fireworkPurple
-                ];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                
-                // 生命周期
-                this.life = 1.0;
-                this.decay = 0.02 + Math.random() * 0.03;
-                
-                // 大小
-                this.size = 0.2 + Math.random() * 0.3;
-                
-                // 闪烁速度
-                this.twinkleSpeed = 3 + Math.random() * 5;
-            }
-
-            initMesh() {
-                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
-                const material = new THREE.MeshBasicMaterial({
-                    color: this.color,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                
-                this.mesh = new THREE.Mesh(geometry, material);
-                this.mesh.scale.setScalar(this.size);
-                scene.add(this.mesh);
-            }
-
-            update(dt) {
-                // 更新位置
-                this.position.add(this.velocity.clone().multiplyScalar(dt * CONFIG.effects.fireworkSpeed));
-                
-                // 应用重力
-                this.velocity.y -= 0.5 * dt;
-                
-                // 边界反弹
-                if (Math.abs(this.position.x) > 10) this.velocity.x *= -0.8;
-                if (Math.abs(this.position.z) > 10) this.velocity.z *= -0.8;
-                if (this.position.y < 0) {
-                    this.position.y = 0;
-                    this.velocity.y *= -0.7;
-                }
-                if (this.position.y > 15) this.velocity.y *= -0.8;
-                
-                // 更新网格位置
-                this.mesh.position.copy(this.position);
-                
-                // 更新生命周期
-                this.life -= this.decay * dt;
-                
-                // 闪烁效果
-                const scale = this.size * (0.8 + 0.4 * Math.sin(clock.elapsedTime * this.twinkleSpeed));
-                this.mesh.scale.setScalar(scale);
-                
-                // 透明度根据生命周期变化
-                this.mesh.material.opacity = this.life * 0.8;
-                
-                // 颜色渐变
-                const intensity = Math.sin(clock.elapsedTime * 2) * 0.5 + 0.5;
-                this.mesh.material.color.setHex(this.color).multiplyScalar(1 + intensity * 0.3);
-                
-                // 如果生命周期结束，重置粒子
-                if (this.life <= 0) {
-                    this.reset();
-                    this.mesh.position.copy(this.position);
-                    this.mesh.material.color.setHex(this.color);
-                }
-            }
         }
 
         class Particle {
@@ -722,7 +671,6 @@
                 this.fireworkDecay = 0.02;
                 this.originalPos = new THREE.Vector3();
                 this.originalScale = this.baseScale;
-                this.originalColor = mesh.material.color.clone();
                 
                 // 为每种粒子添加随机颜色
                 this.assignRandomColor();
@@ -892,7 +840,7 @@
                 
                 // 颜色闪烁
                 const colorIntensity = Math.sin(time * 3 + this.mesh.id * 0.1) * 0.3 + 0.7;
-                this.mesh.material.color.copy(this.originalColor).multiplyScalar(colorIntensity);
+                this.mesh.material.color.multiplyScalar(colorIntensity);
                 
                 // 更新生命周期
                 this.fireworkLife -= this.fireworkDecay * dt;
@@ -903,7 +851,9 @@
         }
 
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.25, 12, 12);
+            console.log('创建粒子...');
+            
+            const sphereGeo = new THREE.SphereGeometry(0.25, 8, 8);
             const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3); 
             
             const goldMat = new THREE.MeshStandardMaterial({
@@ -911,8 +861,7 @@
                 metalness: 0.8, 
                 roughness: 0.2,
                 emissive: CONFIG.colors.champagneGold,
-                emissiveIntensity: 0.8,
-                envMapIntensity: 1.5
+                emissiveIntensity: 0.8
             });
 
             const redMat = new THREE.MeshStandardMaterial({
@@ -1001,8 +950,8 @@
                 particleSystem.push(new Particle(mesh, type, false));
             }
 
-            // 创建发光星星 - 增强光泽感
-            const starGeo = new THREE.OctahedronGeometry(0.6, 1);
+            // 创建发光星星
+            const starGeo = new THREE.OctahedronGeometry(0.6, 0);
             const starMat = new THREE.MeshStandardMaterial({
                 color: 0xffdd88, 
                 emissive: 0xffaa00, 
@@ -1015,9 +964,13 @@
             mainGroup.add(star);
             
             mainGroup.add(photoMeshGroup);
+            
+            console.log('粒子创建完成，数量:', particleSystem.length);
         }
 
         function createDust() {
+            console.log('创建灰尘粒子...');
+            
             const geo = new THREE.TetrahedronGeometry(0.03, 0);
             
             for(let i=0; i<CONFIG.particles.dustCount; i++) {
@@ -1042,10 +995,14 @@
                 mainGroup.add(mesh);
                 particleSystem.push(new Particle(mesh, 'DUST', true));
             }
+            
+            console.log('灰尘粒子创建完成，数量:', CONFIG.particles.dustCount);
         }
 
         function createStarParticles() {
-            const starCount = Math.floor(CONFIG.particles.starCount * CONFIG.effects.starDensity);
+            console.log('创建星光粒子...');
+            
+            const starCount = Math.floor(CONFIG.particles.starCount * 0.7);
             const positions = new Float32Array(starCount * 3);
             const colors = new Float32Array(starCount * 3);
             const sizes = new Float32Array(starCount);
@@ -1054,7 +1011,7 @@
             const rotationSpeeds = new Float32Array(starCount);
 
             for (let i = 0; i < starCount; i++) {
-                // 随机位置（球状分布，但主要集中在远处作为背景）
+                // 随机位置
                 const radius = 15 + Math.random() * 30;
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
@@ -1065,7 +1022,7 @@
                 
                 originalY[i] = positions[i * 3 + 1];
                 
-                // 随机颜色（多种星光颜色）
+                // 随机颜色
                 const colorRand = Math.random();
                 let color;
                 if (colorRand < 0.3) {
@@ -1085,7 +1042,7 @@
                 colors[i * 3 + 2] = color.b;
                 
                 // 随机大小
-                sizes[i] = CONFIG.effects.starSize * (0.5 + Math.random());
+                sizes[i] = 0.1 * (0.5 + Math.random());
                 
                 // 随机闪烁速度
                 twinkleSpeeds[i] = 0.8 + Math.random() * 3;
@@ -1113,50 +1070,13 @@
 
             starPoints = new THREE.Points(geometry, material);
             scene.add(starPoints);
-        }
-
-        function updateStarParticles(dt) {
-            if (!starPoints) return;
             
-            const positions = starPoints.geometry.attributes.position.array;
-            const colors = starPoints.geometry.attributes.color.array;
-            const sizes = starPoints.geometry.attributes.size.array;
-            const { twinkleSpeeds, originalY, rotationSpeeds } = starPoints.geometry.userData;
-            
-            const time = clock.elapsedTime;
-            
-            for (let i = 0; i < positions.length / 3; i++) {
-                // 上下浮动
-                const floatOffset = Math.sin(time * 0.5 + i * 0.1) * 0.8;
-                positions[i * 3 + 1] = originalY[i] + floatOffset;
-                
-                // 轻微旋转运动
-                const angle = time * rotationSpeeds[i];
-                const x = positions[i * 3];
-                const z = positions[i * 3 + 2];
-                positions[i * 3] = x * Math.cos(angle) - z * Math.sin(angle);
-                positions[i * 3 + 2] = x * Math.sin(angle) + z * Math.cos(angle);
-                
-                // 闪烁效果
-                const twinkle = Math.sin(time * twinkleSpeeds[i] * CONFIG.effects.twinkleSpeed) * 0.5 + 0.5;
-                
-                // 更新颜色亮度
-                const brightness = 0.6 + twinkle * 0.4;
-                colors[i * 3] *= brightness;
-                colors[i * 3 + 1] *= brightness;
-                colors[i * 3 + 2] *= brightness;
-                
-                // 更新大小
-                const sizeMultiplier = 0.5 + twinkle * 1.0;
-                sizes[i] = CONFIG.effects.starSize * sizeMultiplier;
-            }
-            
-            starPoints.geometry.attributes.position.needsUpdate = true;
-            starPoints.geometry.attributes.color.needsUpdate = true;
-            starPoints.geometry.attributes.size.needsUpdate = true;
+            console.log('星光粒子创建完成，数量:', starCount);
         }
 
         function createDefaultPhotos() {
+            console.log('创建默认照片...');
+            
             const canvas = document.createElement('canvas');
             canvas.width = 128;
             canvas.height = 128;
@@ -1173,7 +1093,6 @@
             ctx.fillText("快乐", 64, 75);
             
             const tex = new THREE.CanvasTexture(canvas);
-            tex.colorSpace = THREE.SRGBColorSpace;
             addPhotoToScene(tex);
         }
 
@@ -1184,8 +1103,7 @@
                 metalness: 0.8, 
                 roughness: 0.3,
                 emissive: CONFIG.colors.champagneGold,
-                emissiveIntensity: 0.5,
-                envMapIntensity: 1.2
+                emissiveIntensity: 0.5
             });
             const frame = new THREE.Mesh(frameGeo, frameMat);
 
@@ -1239,7 +1157,6 @@
                         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
                         
                         const tex = new THREE.CanvasTexture(canvas);
-                        tex.colorSpace = THREE.SRGBColorSpace;
                         addPhotoToScene(tex);
                         loadedCount++;
                     };
@@ -1257,7 +1174,7 @@
             const particlesToActivate = particleSystem
                 .filter(p => !p.isDust && p.type !== 'PHOTO')
                 .sort(() => Math.random() - 0.5)
-                .slice(0, Math.floor(particleSystem.length * 0.7));
+                .slice(0, Math.floor(particleSystem.length * 0.6));
             
             particlesToActivate.forEach(p => {
                 p.enterFireworkMode();
@@ -1296,6 +1213,8 @@
         }
 
         function setupTouchEvents() {
+            console.log('设置触摸事件...');
+            
             const canvas = renderer.domElement;
             let lastTapTime = 0;
             let tapCount = 0;
@@ -1353,7 +1272,7 @@
                     STATE.touch.lastX = e.touches[0].clientX;
                     STATE.touch.lastY = e.touches[0].clientY;
                     
-                    // 如果有移动，清除点击计数（因为这是拖动操作）
+                    // 如果有移动，清除点击计数
                     if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
                         tapCount = 0;
                     }
@@ -1383,7 +1302,7 @@
                     STATE.touch.isTouching = false;
                     STATE.touch.isPinching = false;
                     
-                    // 处理点击事件（不是拖动）
+                    // 处理点击事件
                     setTimeout(() => {
                         if (tapCount > 0 && !STATE.touch.isTouching) {
                             handleTap(tapCount);
@@ -1507,9 +1426,9 @@
             }
             
             // 更新配置
-            CONFIG.particles.count = STATE.isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600);
-            CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200);
-            CONFIG.particles.starCount = STATE.isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600);
+            CONFIG.particles.count = STATE.isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400);
+            CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 400 : (window.innerWidth < 768 ? 600 : 800);
+            CONFIG.particles.starCount = STATE.isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400);
             CONFIG.camera.z = STATE.isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35);
         }
 
@@ -1526,16 +1445,16 @@
 
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
             
-            // 始终更新星光粒子
+            // 更新星光粒子
             updateStarParticles(dt);
             
             // 根据模式调整后期处理
             if (bloomPass) {
                 if (STATE.mode === 'SCATTER' && STATE.fireworksActive) {
                     // 烟花模式下增强辉光
-                    bloomPass.strength = CONFIG.effects.bloomStrength * 1.5;
+                    bloomPass.strength = 1.5 * 1.5;
                 } else {
-                    bloomPass.strength = CONFIG.effects.bloomStrength;
+                    bloomPass.strength = 1.5;
                 }
             }
             
@@ -1546,17 +1465,59 @@
             }
         }
 
+        function updateStarParticles(dt) {
+            if (!starPoints) return;
+            
+            const positions = starPoints.geometry.attributes.position.array;
+            const colors = starPoints.geometry.attributes.color.array;
+            const sizes = starPoints.geometry.attributes.size.array;
+            const { twinkleSpeeds, originalY, rotationSpeeds } = starPoints.geometry.userData;
+            
+            const time = clock.elapsedTime;
+            
+            for (let i = 0; i < positions.length / 3; i++) {
+                // 上下浮动
+                const floatOffset = Math.sin(time * 0.5 + i * 0.1) * 0.8;
+                positions[i * 3 + 1] = originalY[i] + floatOffset;
+                
+                // 轻微旋转运动
+                const angle = time * rotationSpeeds[i];
+                const x = positions[i * 3];
+                const z = positions[i * 3 + 2];
+                positions[i * 3] = x * Math.cos(angle) - z * Math.sin(angle);
+                positions[i * 3 + 2] = x * Math.sin(angle) + z * Math.cos(angle);
+                
+                // 闪烁效果
+                const twinkle = Math.sin(time * twinkleSpeeds[i] * 1.5) * 0.5 + 0.5;
+                
+                // 更新颜色亮度
+                const brightness = 0.6 + twinkle * 0.4;
+                colors[i * 3] *= brightness;
+                colors[i * 3 + 1] *= brightness;
+                colors[i * 3 + 2] *= brightness;
+                
+                // 更新大小
+                const sizeMultiplier = 0.5 + twinkle * 1.0;
+                sizes[i] = 0.1 * sizeMultiplier;
+            }
+            
+            starPoints.geometry.attributes.position.needsUpdate = true;
+            starPoints.geometry.attributes.color.needsUpdate = true;
+            starPoints.geometry.attributes.size.needsUpdate = true;
+        }
+
         // 设置加载超时
         setTimeout(() => {
             const loader = document.getElementById('loader');
             if (loader && loader.style.display !== 'none') {
                 showError('加载时间过长，请检查网络或刷新页面');
             }
-        }, 15000);
+        }, 10000);
 
         // 页面加载完成后初始化
         window.addEventListener('load', function() {
-            setTimeout(init, 100);
+            console.log('页面加载完成，开始初始化...');
+            setTimeout(init, 500);
         });
     </script>
 </body>
