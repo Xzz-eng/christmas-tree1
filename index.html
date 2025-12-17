@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>牛哞哞</title>
+    <title>圣诞烟花</title>
     
-    <!-- 引入Three.js和相关库（传统方式，兼容性更好） -->
+    <!-- 引入Three.js和相关库 -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/EffectComposer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/FilmPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/GlitchPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/environments/RoomEnvironment.js"></script>
 
     <style>
@@ -22,9 +25,9 @@
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
             --safe-area-inset-left: env(safe-area-inset-left, 0px);
             --safe-area-inset-right: env(safe-area-inset-right, 0px);
-            --dynamic-island-height: 59px; /* iPhone 14 Pro 动态岛高度 */
-            --iphone-14-pro-height: 852px; /* iPhone 14 Pro 逻辑高度 */
-            --iphone-14-pro-width: 393px; /* iPhone 14 Pro 逻辑宽度 */
+            --dynamic-island-height: 59px;
+            --iphone-14-pro-height: 852px;
+            --iphone-14-pro-width: 393px;
         }
         
         * {
@@ -44,7 +47,6 @@
             width: 100vw;
             height: 100vh;
             touch-action: none;
-            /* iPhone 安全区域处理 */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
@@ -58,7 +60,6 @@
             top: 0; 
             left: 0; 
             z-index: 1; 
-            /* 考虑安全区域 */
             margin-top: calc(env(safe-area-inset-top) * -1);
             margin-bottom: calc(env(safe-area-inset-bottom) * -1);
             margin-left: calc(env(safe-area-inset-left) * -1);
@@ -83,7 +84,6 @@
             align-items: center; 
             justify-content: center;
             transition: opacity 0.8s ease-out;
-            /* 安全区域补偿 */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -161,62 +161,6 @@
             background: rgba(212, 175, 55, 0.4);
         }
         
-        /* iPhone 14 Pro 特定优化 */
-        @media only screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) {
-            /* iPhone 14 Pro 竖屏 */
-            body {
-                padding-top: calc(env(safe-area-inset-top) + 10px); /* 为动态岛留空间 */
-            }
-            
-            h1 {
-                margin-top: calc(5vh + env(safe-area-inset-top));
-                font-size: 40px;
-            }
-            
-            .mobile-controls {
-                bottom: calc(20px + env(safe-area-inset-bottom));
-            }
-        }
-        
-        @media only screen and (device-width: 852px) and (device-height: 393px) and (-webkit-device-pixel-ratio: 3) {
-            /* iPhone 14 Pro 横屏 */
-            h1 {
-                font-size: 32px;
-                margin-top: 5vh;
-            }
-            
-            .upload-wrapper {
-                margin-top: 3vh;
-            }
-            
-            .mobile-controls {
-                bottom: 10px;
-            }
-            
-            .control-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 18px;
-            }
-        }
-        
-        /* 通用移动端优化 */
-        @media (max-height: 700px) {
-            /* 小屏幕设备 */
-            h1 {
-                margin-top: 5vh;
-                font-size: 32px;
-            }
-            
-            .upload-wrapper {
-                margin-top: 3vh;
-            }
-            
-            .mobile-controls {
-                bottom: 10px;
-            }
-        }
-        
         /* 动态岛区域处理 */
         .dynamic-island-area {
             position: absolute;
@@ -228,6 +172,124 @@
             background: transparent;
             z-index: 5;
             pointer-events: none;
+        }
+
+        /* 提示文字 */
+        .hint-overlay {
+            position: fixed;
+            bottom: calc(30px + env(safe-area-inset-bottom));
+            left: 0;
+            width: 100vw;
+            text-align: center;
+            color: rgba(255, 200, 100, 0.9);
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+            padding: 0 15px;
+            text-shadow: 0 0 10px rgba(255, 200, 100, 0.8);
+            animation: pulseHint 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseHint {
+            0%, 100% { opacity: 0.6; text-shadow: 0 0 10px rgba(255, 200, 100, 0.5); }
+            50% { opacity: 1; text-shadow: 0 0 20px rgba(255, 200, 100, 1); }
+        }
+
+        /* 模式指示器 */
+        .mode-indicator {
+            position: fixed;
+            top: calc(20px + env(safe-area-inset-top));
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffcc66;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 204, 102, 0.4);
+            font-weight: 600;
+            z-index: 15;
+            box-shadow: 0 0 15px rgba(255, 204, 102, 0.3);
+        }
+
+        /* 上传按钮 */
+        .upload-btn {
+            position: fixed;
+            bottom: calc(80px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.8); 
+            border: 1px solid rgba(255, 204, 102, 0.6); 
+            color: #ffcc66; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-size: 11px;
+            backdrop-filter: blur(10px);
+            border-radius: 6px;
+            touch-action: manipulation;
+            font-weight: 600;
+            -webkit-tap-highlight-color: rgba(255, 204, 102, 0.3);
+            z-index: 15;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 204, 102, 0.2);
+        }
+
+        .upload-btn:active {
+            background: rgba(40, 40, 40, 0.9);
+            transform: translateX(-50%) scale(0.98);
+        }
+
+        /* 标题 */
+        .app-title {
+            position: fixed;
+            top: calc(15px + env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff9e6; 
+            font-size: clamp(24px, 6vw, 28px); 
+            margin: 0; 
+            font-weight: 400; 
+            letter-spacing: 2px; 
+            text-shadow: 0 0 25px rgba(255, 249, 230, 0.8); 
+            background: linear-gradient(to bottom, #ffffff, #ffcc66, #ff9900);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Cinzel', 'Times New Roman', serif;
+            opacity: 0.95;
+            text-align: center;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        /* 烟花效果指示器 */
+        .firework-indicator {
+            position: fixed;
+            bottom: calc(120px + env(safe-area-inset-bottom));
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 100, 100, 0.6);
+            color: #ff6464;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            box-shadow: 0 0 15px rgba(255, 100, 100, 0.3);
         }
     </style>
     
@@ -250,6 +312,16 @@
     <!-- iPhone 14 Pro 动态岛区域（占位用） -->
     <div class="dynamic-island-area"></div>
 
+    <!-- UI元素 -->
+    <div class="app-title">圣诞烟花</div>
+    <div class="mode-indicator" id="mode-indicator">🎄 圣诞树</div>
+    <div class="firework-indicator" id="firework-indicator">🎆 烟花模式</div>
+    <div class="hint-overlay" id="hint-overlay">单指旋转 · 双指缩放</div>
+    
+    <label class="upload-btn" for="file-input">添加照片
+        <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+    </label>
+
     <div id="canvas-container"></div>
 
     <script>
@@ -257,40 +329,65 @@
         const isIPhone14Pro = /iPhone 14 Pro/.test(navigator.userAgent) || 
             (window.screen.width === 393 && window.screen.height === 852 && window.devicePixelRatio === 3);
         
-        // 配置 - 针对iPhone 14 Pro优化
+        // 配置
         const CONFIG = {
             colors: {
                 bg: 0x000000, 
                 champagneGold: 0xffd966, 
                 deepGreen: 0x03180a,     
-                accentRed: 0x990000,     
+                accentRed: 0xff3366,     
+                starBlue: 0x64c8ff,
+                starWhite: 0xffffff,
+                starYellow: 0xfff4b3,
+                starPink: 0xffb6c1,
+                starPurple: 0xbb86fc,
+                fireworkRed: 0xff3366,
+                fireworkOrange: 0xff9933,
+                fireworkYellow: 0xffcc00,
+                fireworkGreen: 0x33ff99,
+                fireworkBlue: 0x3366ff,
+                fireworkPurple: 0xcc66ff
             },
             particles: {
                 count: isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600),
                 dustCount: isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200),
+                starCount: isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600),
+                fireworkCount: 50,
                 treeHeight: 14,  
                 treeRadius: 3.5    
             },
             camera: {
                 z: isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35)
+            },
+            effects: {
+                bloomStrength: 1.5,
+                bloomRadius: 0.8,
+                bloomThreshold: 0.4,
+                starDensity: 0.7,
+                twinkleSpeed: 1.5,
+                starSize: 0.1,
+                fireworkSpeed: 2.0,
+                fireworkIntensity: 1.5
             }
         };
 
         const STATE = {
-            mode: 'TREE', 
-            focusIndex: -1, 
+            mode: 'TREE', // 初始形态为圣诞树
             focusTarget: null,
             touch: { 
                 isTouching: false,
                 lastX: 0,
                 lastY: 0,
                 pinchStart: 0,
-                isPinching: false
+                isPinching: false,
+                tapCount: 0,
+                lastTapTime: 0
             },
             rotation: { x: 0, y: 0 },
             autoRotate: true,
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-            isIPhone14Pro: isIPhone14Pro
+            isIPhone14Pro: isIPhone14Pro,
+            fireworksActive: false
         };
 
         let scene, camera, renderer, composer;
@@ -299,6 +396,9 @@
         let particleSystem = []; 
         let photoMeshGroup = new THREE.Group();
         let caneTexture;
+        let starPoints;
+        let fireworkParticles = [];
+        let bloomPass, filmPass;
 
         // 检查Three.js是否加载成功
         function checkThreeLoaded() {
@@ -335,9 +435,10 @@
                 createTextures();
                 createParticles(); 
                 createDust();     
+                createStarParticles();
                 createDefaultPhotos();
                 setupPostProcessing();
-                setupMobileEvents();
+                setupTouchEvents();
                 
                 // 隐藏加载界面
                 const loader = document.getElementById('loader');
@@ -346,8 +447,8 @@
                         loader.style.opacity = 0;
                         setTimeout(() => {
                             loader.style.display = 'none';
-                            // 确保UI元素可见
-                            updateUIPosition();
+                            // 显示提示文字
+                            showHint('单击：烟花模式 · 双击：圣诞树 · 三击：聚焦照片');
                         }, 800);
                     }, 1000);
                 }
@@ -378,15 +479,16 @@
             
             // iPhone 14 Pro 性能优化
             if (STATE.isIPhone14Pro) {
-                renderer.setPixelRatio(2); // 降低像素比提高性能
+                renderer.setPixelRatio(2);
             } else {
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             }
             
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.toneMapping = THREE.ReinhardToneMapping; 
-            renderer.toneMappingExposure = 1.8; 
+            renderer.toneMapping = THREE.ACESFilmicToneMapping; 
+            renderer.toneMappingExposure = 1.2; 
             renderer.shadowMap.enabled = false;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
             container.appendChild(renderer.domElement);
 
             mainGroup = new THREE.Group();
@@ -410,61 +512,189 @@
         }
 
         function setupLights() {
-            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambient);
 
-            const innerLight = new THREE.PointLight(0xffaa00, 1.0, 10);
+            const innerLight = new THREE.PointLight(0xffaa00, 2.0, 15);
             innerLight.position.set(0, 4, 0);
             mainGroup.add(innerLight);
 
-            const spotGold = new THREE.SpotLight(0xffcc66, 400);
-            spotGold.position.set(10, 20, 20);
-            spotGold.angle = 0.3;
-            spotGold.penumbra = 0.5;
-            scene.add(spotGold);
+            // 添加多个彩色点光源，增强光泽感
+            const colorfulLights = [
+                { color: 0xff3366, position: [-5, 8, -5], intensity: 0.8 },
+                { color: 0x33ff99, position: [5, 6, -3], intensity: 0.6 },
+                { color: 0x3366ff, position: [-3, 7, 5], intensity: 0.7 },
+                { color: 0xffcc00, position: [4, 5, 4], intensity: 0.9 },
+                { color: 0xcc66ff, position: [0, 9, 0], intensity: 1.0 }
+            ];
+
+            colorfulLights.forEach(light => {
+                const pointLight = new THREE.PointLight(light.color, light.intensity, 20);
+                pointLight.position.set(light.position[0], light.position[1], light.position[2]);
+                pointLight.decay = 1.0;
+                scene.add(pointLight);
+            });
+
+            // 添加星光环境光
+            const starAmbient = new THREE.AmbientLight(CONFIG.colors.starBlue, 0.2);
+            scene.add(starAmbient);
         }
 
         function setupPostProcessing() {
-            // iPhone 14 Pro 完全禁用后期处理以保证性能
-            if (STATE.isIPhone14Pro || window.innerWidth < 768 || typeof THREE.EffectComposer === 'undefined') {
+            // iPhone 14 Pro 降低后期处理效果
+            if (STATE.isIPhone14Pro) {
+                setupSimplePostProcessing();
                 return;
             }
             
             try {
                 const renderScene = new THREE.RenderPass(scene, camera);
-                const bloomPass = new THREE.UnrealBloomPass(
+                
+                // 增强辉光效果 - 让烟花更加绚丽
+                bloomPass = new THREE.UnrealBloomPass(
                     new THREE.Vector2(window.innerWidth, window.innerHeight), 
-                    0.8, 0.4, 0.8
+                    CONFIG.effects.bloomStrength, 
+                    CONFIG.effects.bloomRadius, 
+                    CONFIG.effects.bloomThreshold
                 );
-
+                
+                // 添加胶片颗粒效果，增强视觉质感
+                filmPass = new THREE.FilmPass(0.2, 0.5, 648, false);
+                
                 composer = new THREE.EffectComposer(renderer);
                 composer.addPass(renderScene);
                 composer.addPass(bloomPass);
+                composer.addPass(filmPass);
             } catch (error) {
-                console.warn('后期处理设置失败:', error);
+                console.warn('后期处理设置失败，使用简单渲染:', error);
+                setupSimplePostProcessing();
             }
         }
 
+        function setupSimplePostProcessing() {
+            // 简单渲染，无后期处理
+            composer = null;
+        }
+
         function createTextures() {
+            // 创建拐杖糖纹理
             const canvas = document.createElement('canvas');
-            canvas.width = 32;
-            canvas.height = 32;
+            canvas.width = 64;
+            canvas.height = 64;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0,0,32,32);
-            ctx.fillStyle = '#880000'; 
+            ctx.fillRect(0,0,64,64);
+            ctx.fillStyle = '#ff3366'; 
             ctx.beginPath();
-            for(let i=-32; i<64; i+=8) {
+            for(let i=-64; i<128; i+=16) {
                 ctx.moveTo(i, 0); 
-                ctx.lineTo(i+8, 32); 
-                ctx.lineTo(i+4, 32); 
-                ctx.lineTo(i-4, 0);
+                ctx.lineTo(i+16, 64); 
+                ctx.lineTo(i+8, 64); 
+                ctx.lineTo(i-8, 0);
             }
             ctx.fill();
             caneTexture = new THREE.CanvasTexture(canvas);
             caneTexture.wrapS = THREE.RepeatWrapping;
             caneTexture.wrapT = THREE.RepeatWrapping;
             caneTexture.repeat.set(1, 1);
+        }
+
+        class FireworkParticle {
+            constructor() {
+                this.reset();
+                this.initMesh();
+            }
+
+            reset() {
+                // 初始位置在随机位置
+                this.position = new THREE.Vector3(
+                    (Math.random() - 0.5) * 20,
+                    Math.random() * 5,
+                    (Math.random() - 0.5) * 20
+                );
+                
+                // 初始速度
+                this.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 4
+                );
+                
+                // 颜色
+                const colors = [
+                    CONFIG.colors.fireworkRed,
+                    CONFIG.colors.fireworkOrange,
+                    CONFIG.colors.fireworkYellow,
+                    CONFIG.colors.fireworkGreen,
+                    CONFIG.colors.fireworkBlue,
+                    CONFIG.colors.fireworkPurple
+                ];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 生命周期
+                this.life = 1.0;
+                this.decay = 0.02 + Math.random() * 0.03;
+                
+                // 大小
+                this.size = 0.2 + Math.random() * 0.3;
+                
+                // 闪烁速度
+                this.twinkleSpeed = 3 + Math.random() * 5;
+            }
+
+            initMesh() {
+                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const material = new THREE.MeshBasicMaterial({
+                    color: this.color,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.scale.setScalar(this.size);
+                scene.add(this.mesh);
+            }
+
+            update(dt) {
+                // 更新位置
+                this.position.add(this.velocity.clone().multiplyScalar(dt * CONFIG.effects.fireworkSpeed));
+                
+                // 应用重力
+                this.velocity.y -= 0.5 * dt;
+                
+                // 边界反弹
+                if (Math.abs(this.position.x) > 10) this.velocity.x *= -0.8;
+                if (Math.abs(this.position.z) > 10) this.velocity.z *= -0.8;
+                if (this.position.y < 0) {
+                    this.position.y = 0;
+                    this.velocity.y *= -0.7;
+                }
+                if (this.position.y > 15) this.velocity.y *= -0.8;
+                
+                // 更新网格位置
+                this.mesh.position.copy(this.position);
+                
+                // 更新生命周期
+                this.life -= this.decay * dt;
+                
+                // 闪烁效果
+                const scale = this.size * (0.8 + 0.4 * Math.sin(clock.elapsedTime * this.twinkleSpeed));
+                this.mesh.scale.setScalar(scale);
+                
+                // 透明度根据生命周期变化
+                this.mesh.material.opacity = this.life * 0.8;
+                
+                // 颜色渐变
+                const intensity = Math.sin(clock.elapsedTime * 2) * 0.5 + 0.5;
+                this.mesh.material.color.setHex(this.color).multiplyScalar(1 + intensity * 0.3);
+                
+                // 如果生命周期结束，重置粒子
+                if (this.life <= 0) {
+                    this.reset();
+                    this.mesh.position.copy(this.position);
+                    this.mesh.material.color.setHex(this.color);
+                }
+            }
         }
 
         class Particle {
@@ -485,7 +715,42 @@
                     (Math.random() - 0.5) * speedMult
                 );
 
+                // 烟花效果属性
+                this.fireworkMode = false;
+                this.fireworkVelocity = new THREE.Vector3();
+                this.fireworkLife = 1.0;
+                this.fireworkDecay = 0.02;
+                this.originalPos = new THREE.Vector3();
+                this.originalScale = this.baseScale;
+                this.originalColor = mesh.material.color.clone();
+                
+                // 为每种粒子添加随机颜色
+                this.assignRandomColor();
+
                 this.calculatePositions();
+            }
+
+            assignRandomColor() {
+                if (this.type === 'GOLD_BOX' || this.type === 'GOLD_SPHERE') {
+                    // 金色粒子保持金色，但增加一点变化
+                    this.mesh.material.emissive.setHex(0xffcc00);
+                    this.mesh.material.emissiveIntensity = 0.8;
+                } else if (this.type === 'RED') {
+                    this.mesh.material.color.setHex(CONFIG.colors.fireworkRed);
+                    this.mesh.material.emissive.setHex(CONFIG.colors.fireworkRed);
+                    this.mesh.material.emissiveIntensity = 0.6;
+                } else if (this.type === 'BOX') {
+                    // 绿色盒子改为更鲜艳的颜色
+                    const colors = [
+                        CONFIG.colors.fireworkGreen,
+                        CONFIG.colors.fireworkBlue,
+                        CONFIG.colors.fireworkPurple
+                    ];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    this.mesh.material.color.setHex(color);
+                    this.mesh.material.emissive.setHex(color);
+                    this.mesh.material.emissiveIntensity = 0.5;
+                }
             }
 
             calculatePositions() {
@@ -508,9 +773,45 @@
                     rScatter * Math.sin(phi) * Math.sin(theta),
                     rScatter * Math.cos(phi)
                 );
+                
+                this.originalPos.copy(this.posScatter);
+            }
+
+            enterFireworkMode() {
+                this.fireworkMode = true;
+                this.fireworkLife = 1.0;
+                this.fireworkVelocity.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8
+                );
+                
+                // 在烟花模式下增加自发光
+                this.mesh.material.emissiveIntensity = 1.2;
+                
+                // 记录原始位置
+                this.originalPos.copy(this.mesh.position);
+            }
+
+            exitFireworkMode() {
+                this.fireworkMode = false;
+                this.fireworkLife = 1.0;
+                
+                // 恢复原始自发光强度
+                if (this.type === 'GOLD_BOX' || this.type === 'GOLD_SPHERE') {
+                    this.mesh.material.emissiveIntensity = 0.8;
+                } else {
+                    this.mesh.material.emissiveIntensity = 0.5;
+                }
             }
 
             update(dt, mode, focusTargetMesh) {
+                if (mode === 'SCATTER' && this.fireworkMode) {
+                    // 烟花模式更新
+                    this.updateFirework(dt);
+                    return;
+                }
+                
                 let target = this.posTree;
                 
                 if (mode === 'SCATTER') target = this.posScatter;
@@ -531,6 +832,14 @@
                     this.mesh.rotation.x += this.spinSpeed.x * dt;
                     this.mesh.rotation.y += this.spinSpeed.y * dt;
                     this.mesh.rotation.z += this.spinSpeed.z * dt;
+                    
+                    // 在星空模式下增加闪烁效果
+                    const scaleMultiplier = 0.8 + 0.4 * Math.sin(clock.elapsedTime * 2 + this.mesh.id);
+                    this.mesh.scale.lerp(new THREE.Vector3(
+                        this.baseScale * scaleMultiplier,
+                        this.baseScale * scaleMultiplier,
+                        this.baseScale * scaleMultiplier
+                    ), 5 * dt);
                 } else if (mode === 'TREE') {
                     this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
                     this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
@@ -552,54 +861,139 @@
                     else s = this.baseScale * 0.4; 
                 }
                 
-                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 1.5*dt);
+                if (mode !== 'SCATTER') {
+                    this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 1.5*dt);
+                }
+            }
+
+            updateFirework(dt) {
+                // 更新位置
+                this.mesh.position.add(this.fireworkVelocity.clone().multiplyScalar(dt * CONFIG.effects.fireworkSpeed));
+                
+                // 应用阻力
+                this.fireworkVelocity.multiplyScalar(0.99);
+                
+                // 边界反弹
+                const bounds = 15;
+                if (Math.abs(this.mesh.position.x) > bounds) this.fireworkVelocity.x *= -0.9;
+                if (Math.abs(this.mesh.position.y) > bounds) this.fireworkVelocity.y *= -0.9;
+                if (Math.abs(this.mesh.position.z) > bounds) this.fireworkVelocity.z *= -0.9;
+                
+                // 更新旋转
+                this.mesh.rotation.x += this.spinSpeed.x * dt * 2;
+                this.mesh.rotation.y += this.spinSpeed.y * dt * 2;
+                this.mesh.rotation.z += this.spinSpeed.z * dt * 2;
+                
+                // 闪烁效果
+                const time = clock.elapsedTime;
+                const pulse = Math.sin(time * 5 + this.mesh.id) * 0.5 + 0.5;
+                const scale = this.originalScale * (0.7 + 0.6 * pulse);
+                this.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 10 * dt);
+                
+                // 颜色闪烁
+                const colorIntensity = Math.sin(time * 3 + this.mesh.id * 0.1) * 0.3 + 0.7;
+                this.mesh.material.color.copy(this.originalColor).multiplyScalar(colorIntensity);
+                
+                // 更新生命周期
+                this.fireworkLife -= this.fireworkDecay * dt;
+                if (this.fireworkLife <= 0) {
+                    this.exitFireworkMode();
+                }
             }
         }
 
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.25, 6, 6); // 更少的面数
+            const sphereGeo = new THREE.SphereGeometry(0.25, 12, 12);
             const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3); 
             
             const goldMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.champagneGold,
-                metalness: 0.6, 
-                roughness: 0.5
-            });
-
-            const greenMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.deepGreen,
-                roughness: 0.9
+                metalness: 0.8, 
+                roughness: 0.2,
+                emissive: CONFIG.colors.champagneGold,
+                emissiveIntensity: 0.8,
+                envMapIntensity: 1.5
             });
 
             const redMat = new THREE.MeshStandardMaterial({
                 color: CONFIG.colors.accentRed,
-                roughness: 0.6
+                metalness: 0.7,
+                roughness: 0.3,
+                emissive: CONFIG.colors.fireworkRed,
+                emissiveIntensity: 0.6
             });
             
             const candyMat = new THREE.MeshStandardMaterial({ 
                 map: caneTexture, 
-                roughness: 0.8 
+                metalness: 0.6,
+                roughness: 0.4,
+                emissive: 0xff6666,
+                emissiveIntensity: 0.5
             });
+
+            // 创建多种颜色的材质
+            const colorfulMats = [
+                new THREE.MeshStandardMaterial({
+                    color: CONFIG.colors.fireworkGreen,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: CONFIG.colors.fireworkGreen,
+                    emissiveIntensity: 0.5
+                }),
+                new THREE.MeshStandardMaterial({
+                    color: CONFIG.colors.fireworkBlue,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: CONFIG.colors.fireworkBlue,
+                    emissiveIntensity: 0.5
+                }),
+                new THREE.MeshStandardMaterial({
+                    color: CONFIG.colors.fireworkPurple,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: CONFIG.colors.fireworkPurple,
+                    emissiveIntensity: 0.5
+                }),
+                new THREE.MeshStandardMaterial({
+                    color: CONFIG.colors.fireworkOrange,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: CONFIG.colors.fireworkOrange,
+                    emissiveIntensity: 0.5
+                }),
+                new THREE.MeshStandardMaterial({
+                    color: CONFIG.colors.fireworkYellow,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: CONFIG.colors.fireworkYellow,
+                    emissiveIntensity: 0.5
+                })
+            ];
 
             for (let i = 0; i < CONFIG.particles.count; i++) {
                 const rand = Math.random();
                 let mesh, type;
                 
-                if (rand < 0.50) {
-                    mesh = new THREE.Mesh(boxGeo, greenMat);
+                if (rand < 0.40) {
+                    // 彩色方块
+                    const matIndex = Math.floor(Math.random() * colorfulMats.length);
+                    mesh = new THREE.Mesh(boxGeo, colorfulMats[matIndex]);
                     type = 'BOX';
-                } else if (rand < 0.80) {
+                } else if (rand < 0.70) {
+                    // 金色方块
                     mesh = new THREE.Mesh(boxGeo, goldMat);
                     type = 'GOLD_BOX';
-                } else if (rand < 0.95) {
+                } else if (rand < 0.90) {
+                    // 金色球体
                     mesh = new THREE.Mesh(sphereGeo, goldMat);
                     type = 'GOLD_SPHERE';
                 } else {
+                    // 红色球体
                     mesh = new THREE.Mesh(sphereGeo, redMat);
                     type = 'RED';
                 }
 
-                const s = 0.15 + Math.random() * 0.25;
+                const s = 0.2 + Math.random() * 0.3;
                 mesh.scale.set(s,s,s);
                 mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
                 
@@ -607,11 +1001,14 @@
                 particleSystem.push(new Particle(mesh, type, false));
             }
 
-            const starGeo = new THREE.OctahedronGeometry(0.6, 0);
+            // 创建发光星星 - 增强光泽感
+            const starGeo = new THREE.OctahedronGeometry(0.6, 1);
             const starMat = new THREE.MeshStandardMaterial({
                 color: 0xffdd88, 
                 emissive: 0xffaa00, 
-                emissiveIntensity: 0.5
+                emissiveIntensity: 2.0,
+                metalness: 0.8,
+                roughness: 0.1
             });
             const star = new THREE.Mesh(starGeo, starMat);
             star.position.set(0, CONFIG.particles.treeHeight/2 + 0.5, 0);
@@ -622,18 +1019,141 @@
 
         function createDust() {
             const geo = new THREE.TetrahedronGeometry(0.03, 0);
-            const mat = new THREE.MeshBasicMaterial({ 
-                color: 0xffeebb, 
-                transparent: true, 
-                opacity: 0.3 
-            });
             
             for(let i=0; i<CONFIG.particles.dustCount; i++) {
-                 const mesh = new THREE.Mesh(geo, mat);
-                 mesh.scale.setScalar(0.15 + Math.random());
-                 mainGroup.add(mesh);
-                 particleSystem.push(new Particle(mesh, 'DUST', true));
+                const colorRand = Math.random();
+                let color;
+                if (colorRand < 0.3) {
+                    color = CONFIG.colors.starBlue;
+                } else if (colorRand < 0.6) {
+                    color = CONFIG.colors.starWhite;
+                } else {
+                    color = CONFIG.colors.starYellow;
+                }
+                
+                const mat = new THREE.MeshBasicMaterial({ 
+                    color: color, 
+                    transparent: true, 
+                    opacity: 0.5 
+                });
+                
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.scale.setScalar(0.2 + Math.random());
+                mainGroup.add(mesh);
+                particleSystem.push(new Particle(mesh, 'DUST', true));
             }
+        }
+
+        function createStarParticles() {
+            const starCount = Math.floor(CONFIG.particles.starCount * CONFIG.effects.starDensity);
+            const positions = new Float32Array(starCount * 3);
+            const colors = new Float32Array(starCount * 3);
+            const sizes = new Float32Array(starCount);
+            const twinkleSpeeds = new Float32Array(starCount);
+            const originalY = new Float32Array(starCount);
+            const rotationSpeeds = new Float32Array(starCount);
+
+            for (let i = 0; i < starCount; i++) {
+                // 随机位置（球状分布，但主要集中在远处作为背景）
+                const radius = 15 + Math.random() * 30;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = radius * Math.cos(phi);
+                
+                originalY[i] = positions[i * 3 + 1];
+                
+                // 随机颜色（多种星光颜色）
+                const colorRand = Math.random();
+                let color;
+                if (colorRand < 0.3) {
+                    color = new THREE.Color(CONFIG.colors.starBlue);
+                } else if (colorRand < 0.5) {
+                    color = new THREE.Color(CONFIG.colors.starWhite);
+                } else if (colorRand < 0.7) {
+                    color = new THREE.Color(CONFIG.colors.starYellow);
+                } else if (colorRand < 0.85) {
+                    color = new THREE.Color(CONFIG.colors.starPink);
+                } else {
+                    color = new THREE.Color(CONFIG.colors.starPurple);
+                }
+                
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+                
+                // 随机大小
+                sizes[i] = CONFIG.effects.starSize * (0.5 + Math.random());
+                
+                // 随机闪烁速度
+                twinkleSpeeds[i] = 0.8 + Math.random() * 3;
+                
+                // 随机旋转速度
+                rotationSpeeds[i] = (Math.random() - 0.5) * 0.8;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            // 存储额外属性
+            geometry.userData = { twinkleSpeeds, originalY, rotationSpeeds };
+
+            const material = new THREE.PointsMaterial({
+                size: 0.12,
+                vertexColors: true,
+                transparent: true,
+                opacity: 1.0,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            starPoints = new THREE.Points(geometry, material);
+            scene.add(starPoints);
+        }
+
+        function updateStarParticles(dt) {
+            if (!starPoints) return;
+            
+            const positions = starPoints.geometry.attributes.position.array;
+            const colors = starPoints.geometry.attributes.color.array;
+            const sizes = starPoints.geometry.attributes.size.array;
+            const { twinkleSpeeds, originalY, rotationSpeeds } = starPoints.geometry.userData;
+            
+            const time = clock.elapsedTime;
+            
+            for (let i = 0; i < positions.length / 3; i++) {
+                // 上下浮动
+                const floatOffset = Math.sin(time * 0.5 + i * 0.1) * 0.8;
+                positions[i * 3 + 1] = originalY[i] + floatOffset;
+                
+                // 轻微旋转运动
+                const angle = time * rotationSpeeds[i];
+                const x = positions[i * 3];
+                const z = positions[i * 3 + 2];
+                positions[i * 3] = x * Math.cos(angle) - z * Math.sin(angle);
+                positions[i * 3 + 2] = x * Math.sin(angle) + z * Math.cos(angle);
+                
+                // 闪烁效果
+                const twinkle = Math.sin(time * twinkleSpeeds[i] * CONFIG.effects.twinkleSpeed) * 0.5 + 0.5;
+                
+                // 更新颜色亮度
+                const brightness = 0.6 + twinkle * 0.4;
+                colors[i * 3] *= brightness;
+                colors[i * 3 + 1] *= brightness;
+                colors[i * 3 + 2] *= brightness;
+                
+                // 更新大小
+                const sizeMultiplier = 0.5 + twinkle * 1.0;
+                sizes[i] = CONFIG.effects.starSize * sizeMultiplier;
+            }
+            
+            starPoints.geometry.attributes.position.needsUpdate = true;
+            starPoints.geometry.attributes.color.needsUpdate = true;
+            starPoints.geometry.attributes.size.needsUpdate = true;
         }
 
         function createDefaultPhotos() {
@@ -643,11 +1163,11 @@
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#050505'; 
             ctx.fillRect(0,0,128,128);
-            ctx.strokeStyle = '#eebb66'; 
-            ctx.lineWidth = 3; 
+            ctx.strokeStyle = '#ffcc66'; 
+            ctx.lineWidth = 4; 
             ctx.strokeRect(4,4,120,120);
             ctx.font = '300 16px "Times New Roman"'; 
-            ctx.fillStyle = '#eebb66';
+            ctx.fillStyle = '#ffcc66';
             ctx.textAlign = 'center'; 
             ctx.fillText("圣诞", 64, 55);
             ctx.fillText("快乐", 64, 75);
@@ -661,13 +1181,20 @@
             const frameGeo = new THREE.BoxGeometry(0.9, 0.9, 0.02);
             const frameMat = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.champagneGold, 
-                metalness: 0.6, 
-                roughness: 0.5 
+                metalness: 0.8, 
+                roughness: 0.3,
+                emissive: CONFIG.colors.champagneGold,
+                emissiveIntensity: 0.5,
+                envMapIntensity: 1.2
             });
             const frame = new THREE.Mesh(frameGeo, frameMat);
 
             const photoGeo = new THREE.PlaneGeometry(0.75, 0.75);
-            const photoMat = new THREE.MeshBasicMaterial({ map: texture });
+            const photoMat = new THREE.MeshBasicMaterial({ 
+                map: texture,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.3
+            });
             const photo = new THREE.Mesh(photoGeo, photoMat);
             photo.position.z = 0.015;
 
@@ -694,7 +1221,7 @@
             
             let loadedCount = 0;
             Array.from(files).forEach(f => {
-                if (loadedCount >= 2) return; // iPhone 14 Pro 一次最多处理2张
+                if (loadedCount >= 2) return;
                 
                 const reader = new FileReader();
                 reader.onload = (ev) => {
@@ -722,418 +1249,211 @@
             });
         }
 
-        // 更新UI位置以确保可见
-        function updateUIPosition() {
-            const viewportHeight = window.innerHeight;
-            const viewportWidth = window.innerWidth;
+        function activateFireworks() {
+            // 激活烟花效果
+            STATE.fireworksActive = true;
             
-            // 计算安全区域
-            const safeAreaTop = window.safeAreaInsets ? window.safeAreaInsets.top : 0;
-            const safeAreaBottom = window.safeAreaInsets ? window.safeAreaInsets.bottom : 0;
+            // 随机选择一些粒子进入烟花模式
+            const particlesToActivate = particleSystem
+                .filter(p => !p.isDust && p.type !== 'PHOTO')
+                .sort(() => Math.random() - 0.5)
+                .slice(0, Math.floor(particleSystem.length * 0.7));
             
-            console.log('视口尺寸:', viewportWidth, 'x', viewportHeight);
-            console.log('安全区域:', safeAreaTop, safeAreaBottom);
+            particlesToActivate.forEach(p => {
+                p.enterFireworkMode();
+            });
             
-            // 动态调整UI位置
-            const title = document.querySelector('h1');
-            const controls = document.querySelector('.mobile-controls');
-            const uploadWrapper = document.querySelector('.upload-wrapper');
-            
-            if (title) {
-                if (viewportHeight < 700) {
-                    // 小屏幕设备
-                    title.style.marginTop = '3vh';
-                    title.style.fontSize = '28px';
-                } else if (STATE.isIPhone14Pro) {
-                    // iPhone 14 Pro
-                    title.style.marginTop = 'calc(4vh + env(safe-area-inset-top))';
-                }
+            // 显示烟花指示器
+            const indicator = document.getElementById('firework-indicator');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                }, 3000);
             }
             
-            if (controls) {
-                if (STATE.isIPhone14Pro) {
-                    controls.style.bottom = 'calc(15px + env(safe-area-inset-bottom))';
-                } else if (viewportHeight < 700) {
-                    controls.style.bottom = '10px';
-                } else {
-                    controls.style.bottom = 'calc(20px + env(safe-area-inset-bottom))';
-                }
-                
-                // 确保控制按钮可见
-                controls.style.display = 'flex';
-                controls.style.opacity = '1';
-                controls.style.zIndex = '20';
-            }
-            
-            if (uploadWrapper && viewportHeight < 700) {
-                uploadWrapper.style.marginTop = '2vh';
+            // 增强辉光效果
+            if (bloomPass) {
+                bloomPass.strength = CONFIG.effects.bloomStrength * 1.5;
             }
         }
 
-        function setupMobileEvents() {
-            // 创建UI界面
-            const uiHTML = `
-                <div id="ui-layer" style="
-                    position: fixed; 
-                    top: 0; 
-                    left: 0; 
-                    width: 100vw; 
-                    height: 100vh;
-                    z-index: 10; 
-                    pointer-events: none;
-                    display: flex; 
-                    flex-direction: column; 
-                    align-items: center;
-                    padding-top: calc(6vh + env(safe-area-inset-top));
-                    box-sizing: border-box;
-                ">
-                    <h1 style="
-                        color: #fceea7; 
-                        font-size: ${STATE.isIPhone14Pro ? '36px' : 'clamp(32px, 8vw, 42px)'}; 
-                        margin: 0 0 4vh 0; 
-                        font-weight: 400; 
-                        letter-spacing: 2px; 
-                        text-shadow: 0 0 20px rgba(252, 238, 167, 0.6); 
-                        background: linear-gradient(to bottom, #fff, #eebb66);
-                        -webkit-background-clip: text; 
-                        -webkit-text-fill-color: transparent;
-                        background-clip: text;
-                        font-family: 'Cinzel', 'Times New Roman', serif;
-                        opacity: 0.9;
-                        text-align: center;
-                        padding: 0 15px;
-                        pointer-events: none;
-                    ">圣诞快乐</h1>
-                    
-                    <div class="upload-wrapper" style="
-                        margin-top: ${STATE.isIPhone14Pro ? '3vh' : '4vh'};
-                        pointer-events: auto;
-                        text-align: center;
-                        width: 90%;
-                        max-width: 250px;
-                    ">
-                        <label class="upload-btn" style="
-                            background: rgba(20, 20, 20, 0.8); 
-                            border: 1px solid rgba(212, 175, 55, 0.5); 
-                            color: #d4af37; 
-                            padding: 12px 20px; 
-                            cursor: pointer; 
-                            text-transform: uppercase; 
-                            letter-spacing: 1px; 
-                            font-size: 12px;
-                            display: block;
-                            backdrop-filter: blur(10px);
-                            border-radius: 4px;
-                            touch-action: manipulation;
-                            min-height: 44px;
-                            font-weight: 500;
-                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-                        ">
-                            添加照片
-                            <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
-                        </label>
-                        <div class="hint-text" style="
-                            color: rgba(212, 175, 55, 0.5);
-                            font-size: 10px;
-                            margin-top: 8px;
-                            letter-spacing: 0.5px;
-                            text-transform: uppercase;
-                            text-align: center;
-                            padding: 0 10px;
-                            pointer-events: none;
-                        ">单指旋转 · 双指缩放</div>
-                    </div>
-                    
-                    <div id="mode-indicator" style="
-                        position: absolute;
-                        top: calc(15px + env(safe-area-inset-top));
-                        right: 15px;
-                        background: rgba(0, 0, 0, 0.5);
-                        color: #d4af37;
-                        padding: 6px 12px;
-                        border-radius: 15px;
-                        font-size: 11px;
-                        letter-spacing: 0.5px;
-                        text-transform: uppercase;
-                        pointer-events: none;
-                        backdrop-filter: blur(10px);
-                        border: 1px solid rgba(212, 175, 55, 0.3);
-                        font-weight: 500;
-                        z-index: 15;
-                    ">🎄 圣诞树模式</div>
-                    
-                    <!-- 触摸区域 -->
-                    <div id="touch-area" style="
-                        position: absolute;
-                        top: calc(100px + env(safe-area-inset-top));
-                        left: 0;
-                        width: 100vw;
-                        height: 60vh;
-                        z-index: 5;
-                        pointer-events: auto;
-                        background: transparent;
-                    "></div>
-                    
-                    <!-- 移动端控制按钮 -->
-                    <div class="mobile-controls" style="
-                        position: fixed;
-                        bottom: calc(20px + env(safe-area-inset-bottom));
-                        left: 0;
-                        width: 100vw;
-                        display: flex;
-                        justify-content: space-around;
-                        align-items: center;
-                        pointer-events: auto;
-                        padding: 0 15px;
-                        box-sizing: border-box;
-                        z-index: 20;
-                    ">
-                        <div class="control-btn" id="btn-tree" title="圣诞树模式" style="
-                            background: rgba(30, 30, 30, 0.7);
-                            border: 1px solid rgba(212, 175, 55, 0.4);
-                            color: #d4af37;
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 20px;
-                            cursor: pointer;
-                            touch-action: manipulation;
-                            transition: all 0.3s;
-                            backdrop-filter: blur(10px);
-                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-                        ">🎄</div>
-                        <div class="control-btn" id="btn-scatter" title="星空模式" style="
-                            background: rgba(30, 30, 30, 0.7);
-                            border: 1px solid rgba(212, 175, 55, 0.4);
-                            color: #d4af37;
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 20px;
-                            cursor: pointer;
-                            touch-action: manipulation;
-                            transition: all 0.3s;
-                            backdrop-filter: blur(10px);
-                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-                        ">✨</div>
-                        <div class="control-btn" id="btn-focus" title="随机聚焦" style="
-                            background: rgba(30, 30, 30, 0.7);
-                            border: 1px solid rgba(212, 175, 55, 0.4);
-                            color: #d4af37;
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 20px;
-                            cursor: pointer;
-                            touch-action: manipulation;
-                            transition: all 0.3s;
-                            backdrop-filter: blur(10px);
-                            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-                        ">📸</div>
-                    </div>
-                    
-                    <!-- 隐藏/显示UI按钮 -->
-                    <div class="control-btn" id="btn-toggle-ui" title="显示/隐藏控制" style="
-                        position: fixed;
-                        bottom: calc(85px + env(safe-area-inset-bottom));
-                        right: 20px;
-                        background: rgba(30, 30, 30, 0.7);
-                        border: 1px solid rgba(212, 175, 55, 0.4);
-                        color: #d4af37;
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 18px;
-                        cursor: pointer;
-                        touch-action: manipulation;
-                        transition: all 0.3s;
-                        backdrop-filter: blur(10px);
-                        z-index: 20;
-                        pointer-events: auto;
-                        -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-                    ">👁️</div>
-                </div>
-            `;
+        function deactivateFireworks() {
+            // 停用烟花效果
+            STATE.fireworksActive = false;
             
-            document.body.insertAdjacentHTML('beforeend', uiHTML);
+            // 所有粒子退出烟花模式
+            particleSystem.forEach(p => {
+                if (p.fireworkMode) {
+                    p.exitFireworkMode();
+                }
+            });
             
-            // 获取DOM元素
-            const touchArea = document.getElementById('touch-area');
-            const fileInput = document.getElementById('file-input');
-            const btnTree = document.getElementById('btn-tree');
-            const btnScatter = document.getElementById('btn-scatter');
-            const btnFocus = document.getElementById('btn-focus');
-            const btnToggleUI = document.getElementById('btn-toggle-ui');
-            const uploadWrapper = document.querySelector('.upload-wrapper');
-            const modeIndicator = document.getElementById('mode-indicator');
-            const mobileControls = document.querySelector('.mobile-controls');
+            // 恢复辉光效果
+            if (bloomPass) {
+                bloomPass.strength = CONFIG.effects.bloomStrength;
+            }
+        }
+
+        function setupTouchEvents() {
+            const canvas = renderer.domElement;
+            let lastTapTime = 0;
+            let tapCount = 0;
+            const tapTimeout = 300; // 300毫秒内视为连续点击
             
             // 文件上传
+            const fileInput = document.getElementById('file-input');
             if (fileInput) {
                 fileInput.addEventListener('change', handleImageUpload);
             }
             
-            // 触摸事件
-            if (touchArea) {
-                touchArea.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (e.touches.length === 1) {
-                        STATE.touch.isTouching = true;
-                        STATE.touch.lastX = e.touches[0].clientX;
-                        STATE.touch.lastY = e.touches[0].clientY;
-                        STATE.autoRotate = false;
-                    } else if (e.touches.length === 2) {
-                        STATE.touch.isPinching = true;
-                        const dx = e.touches[0].clientX - e.touches[1].clientX;
-                        const dy = e.touches[0].clientY - e.touches[1].clientY;
-                        STATE.touch.pinchStart = Math.sqrt(dx * dx + dy * dy);
-                    }
-                });
-
-                touchArea.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
+            // 触摸开始
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                
+                if (e.touches.length === 1) {
+                    STATE.touch.isTouching = true;
+                    STATE.touch.lastX = e.touches[0].clientX;
+                    STATE.touch.lastY = e.touches[0].clientY;
+                    STATE.autoRotate = false;
                     
-                    if (e.touches.length === 1 && STATE.touch.isTouching) {
-                        const deltaX = e.touches[0].clientX - STATE.touch.lastX;
-                        const deltaY = e.touches[0].clientY - STATE.touch.lastY;
-                        
-                        STATE.rotation.y += deltaX * 0.005;
-                        STATE.rotation.x += deltaY * 0.0025;
-                        
-                        STATE.rotation.x = Math.max(-0.25, Math.min(0.25, STATE.rotation.x));
-                        
-                        STATE.touch.lastX = e.touches[0].clientX;
-                        STATE.touch.lastY = e.touches[0].clientY;
+                    // 点击计数逻辑
+                    const currentTime = Date.now();
+                    const timeDiff = currentTime - lastTapTime;
+                    
+                    if (timeDiff < tapTimeout) {
+                        tapCount++;
+                    } else {
+                        tapCount = 1;
                     }
                     
-                    if (e.touches.length === 2 && STATE.touch.isPinching) {
-                        const dx = e.touches[0].clientX - e.touches[1].clientX;
-                        const dy = e.touches[0].clientY - e.touches[1].clientY;
-                        const pinchCurrent = Math.sqrt(dx * dx + dy * dy);
-                        const scale = pinchCurrent / STATE.touch.pinchStart;
-                        
-                        camera.position.z = THREE.MathUtils.clamp(
-                            camera.position.z / scale, 
-                            8, 
-                            30
-                        );
-                        
-                        STATE.touch.pinchStart = pinchCurrent;
+                    lastTapTime = currentTime;
+                    
+                } else if (e.touches.length === 2) {
+                    STATE.touch.isPinching = true;
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    STATE.touch.pinchStart = Math.sqrt(dx * dx + dy * dy);
+                }
+            });
+            
+            // 触摸移动
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                
+                if (e.touches.length === 1 && STATE.touch.isTouching) {
+                    const deltaX = e.touches[0].clientX - STATE.touch.lastX;
+                    const deltaY = e.touches[0].clientY - STATE.touch.lastY;
+                    
+                    STATE.rotation.y += deltaX * 0.005;
+                    STATE.rotation.x += deltaY * 0.0025;
+                    
+                    STATE.rotation.x = Math.max(-0.25, Math.min(0.25, STATE.rotation.x));
+                    
+                    STATE.touch.lastX = e.touches[0].clientX;
+                    STATE.touch.lastY = e.touches[0].clientY;
+                    
+                    // 如果有移动，清除点击计数（因为这是拖动操作）
+                    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                        tapCount = 0;
                     }
-                });
-
-                touchArea.addEventListener('touchend', (e) => {
+                }
+                
+                if (e.touches.length === 2 && STATE.touch.isPinching) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const pinchCurrent = Math.sqrt(dx * dx + dy * dy);
+                    const scale = pinchCurrent / STATE.touch.pinchStart;
+                    
+                    camera.position.z = THREE.MathUtils.clamp(
+                        camera.position.z / scale, 
+                        8, 
+                        30
+                    );
+                    
+                    STATE.touch.pinchStart = pinchCurrent;
+                }
+            });
+            
+            // 触摸结束
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                
+                if (e.touches.length === 0) {
                     STATE.touch.isTouching = false;
                     STATE.touch.isPinching = false;
-                    if (e.touches.length === 0 && STATE.mode === 'TREE') {
+                    
+                    // 处理点击事件（不是拖动）
+                    setTimeout(() => {
+                        if (tapCount > 0 && !STATE.touch.isTouching) {
+                            handleTap(tapCount);
+                            tapCount = 0;
+                        }
+                    }, tapTimeout);
+                    
+                    if (STATE.mode === 'TREE') {
                         setTimeout(() => {
                             STATE.autoRotate = true;
                         }, 2000);
                     }
-                });
-            }
+                } else if (e.touches.length === 1) {
+                    // 还剩一个手指，更新触摸状态
+                    STATE.touch.isTouching = true;
+                    STATE.touch.lastX = e.touches[0].clientX;
+                    STATE.touch.lastY = e.touches[0].clientY;
+                }
+            });
             
-            // 控制按钮事件
-            if (btnTree) {
-                btnTree.addEventListener('click', () => {
-                    STATE.mode = 'TREE';
-                    STATE.focusTarget = null;
-                    STATE.autoRotate = true;
-                    updateModeIndicator();
-                });
-            }
-            
-            if (btnScatter) {
-                btnScatter.addEventListener('click', () => {
-                    STATE.mode = 'SCATTER';
-                    STATE.focusTarget = null;
-                    STATE.autoRotate = false;
-                    updateModeIndicator();
-                });
-            }
-            
-            if (btnFocus) {
-                btnFocus.addEventListener('click', () => {
-                    const photos = particleSystem.filter(p => p.type === 'PHOTO');
-                    if (photos.length > 0) {
-                        STATE.mode = 'FOCUS';
-                        const randomIndex = Math.floor(Math.random() * photos.length);
-                        STATE.focusTarget = photos[randomIndex].mesh;
+            // 处理点击事件
+            function handleTap(count) {
+                switch(count) {
+                    case 1:
+                        // 单击：切换到烟花模式
+                        STATE.mode = 'SCATTER';
+                        STATE.focusTarget = null;
                         STATE.autoRotate = false;
-                        updateModeIndicator();
-                    }
-                });
-            }
-            
-            // 隐藏/显示UI按钮
-            if (btnToggleUI) {
-                let uiHidden = false;
-                btnToggleUI.addEventListener('click', () => {
-                    uiHidden = !uiHidden;
-                    if (uploadWrapper) {
-                        uploadWrapper.style.opacity = uiHidden ? '0' : '1';
-                        uploadWrapper.style.pointerEvents = uiHidden ? 'none' : 'auto';
-                    }
-                    if (modeIndicator) {
-                        modeIndicator.style.opacity = uiHidden ? '0' : '1';
-                    }
-                    if (btnToggleUI) {
-                        btnToggleUI.innerHTML = uiHidden ? '👁️‍🗨️' : '👁️';
-                    }
-                });
-            }
-            
-            // 双击隐藏/显示UI
-            let lastTap = 0;
-            if (touchArea) {
-                touchArea.addEventListener('touchend', (e) => {
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTap;
-                    if (tapLength < 300 && tapLength > 0) {
-                        // 双击切换UI显示
-                        const uploadWrapper = document.querySelector('.upload-wrapper');
-                        const modeIndicator = document.getElementById('mode-indicator');
-                        const mobileControls = document.querySelector('.mobile-controls');
-                        const btnToggleUI = document.getElementById('btn-toggle-ui');
+                        activateFireworks();
+                        showHint('烟花模式：绚丽绽放');
+                        break;
                         
-                        if (uploadWrapper && modeIndicator && mobileControls && btnToggleUI) {
-                            const isHidden = uploadWrapper.style.opacity === '0';
-                            uploadWrapper.style.opacity = isHidden ? '1' : '0';
-                            uploadWrapper.style.pointerEvents = isHidden ? 'auto' : 'none';
-                            modeIndicator.style.opacity = isHidden ? '1' : '0';
-                            mobileControls.style.opacity = isHidden ? '1' : '0';
-                            mobileControls.style.pointerEvents = isHidden ? 'auto' : 'none';
-                            btnToggleUI.innerHTML = isHidden ? '👁️' : '👁️‍🗨️';
+                    case 2:
+                        // 双击：切换回圣诞树模式
+                        STATE.mode = 'TREE';
+                        STATE.focusTarget = null;
+                        STATE.autoRotate = true;
+                        deactivateFireworks();
+                        showHint('圣诞树模式：自动旋转');
+                        break;
+                        
+                    case 3:
+                        // 三击：聚焦照片模式
+                        deactivateFireworks();
+                        const photos = particleSystem.filter(p => p.type === 'PHOTO');
+                        if (photos.length > 0) {
+                            STATE.mode = 'FOCUS';
+                            const randomIndex = Math.floor(Math.random() * photos.length);
+                            STATE.focusTarget = photos[randomIndex].mesh;
+                            STATE.autoRotate = false;
+                            showHint('聚焦模式：随机选中一张照片');
+                        } else {
+                            showHint('请先添加照片');
                         }
-                    }
-                    lastTap = currentTime;
-                });
+                        break;
+                }
+                
+                updateModeIndicator();
             }
             
             // 窗口大小变化
             window.addEventListener('resize', function() {
                 setTimeout(() => {
                     onWindowResize();
-                    updateUIPosition();
                 }, 100);
             });
             
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
                     onWindowResize();
-                    updateUIPosition();
                 }, 500);
             });
         }
@@ -1144,14 +1464,36 @@
             
             switch(STATE.mode) {
                 case 'TREE':
-                    indicator.textContent = '🎄 圣诞树模式';
+                    indicator.textContent = '🎄 圣诞树';
+                    indicator.style.borderColor = 'rgba(255, 204, 102, 0.4)';
+                    indicator.style.color = '#ffcc66';
+                    indicator.style.boxShadow = '0 0 15px rgba(255, 204, 102, 0.3)';
                     break;
                 case 'SCATTER':
-                    indicator.textContent = '✨ 星空模式';
+                    indicator.textContent = '🎆 烟花';
+                    indicator.style.borderColor = 'rgba(255, 100, 100, 0.6)';
+                    indicator.style.color = '#ff6464';
+                    indicator.style.boxShadow = '0 0 20px rgba(255, 100, 100, 0.5)';
                     break;
                 case 'FOCUS':
                     indicator.textContent = '📸 聚焦照片';
+                    indicator.style.borderColor = 'rgba(100, 200, 255, 0.6)';
+                    indicator.style.color = '#64c8ff';
+                    indicator.style.boxShadow = '0 0 15px rgba(100, 200, 255, 0.3)';
                     break;
+            }
+        }
+
+        function showHint(message) {
+            const hintOverlay = document.getElementById('hint-overlay');
+            if (hintOverlay) {
+                hintOverlay.textContent = message;
+                hintOverlay.style.opacity = '1';
+                
+                // 3秒后恢复默认提示
+                setTimeout(() => {
+                    hintOverlay.textContent = '单指旋转 · 双指缩放';
+                }, 3000);
             }
         }
 
@@ -1167,6 +1509,7 @@
             // 更新配置
             CONFIG.particles.count = STATE.isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600);
             CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 600 : (window.innerWidth < 768 ? 800 : 1200);
+            CONFIG.particles.starCount = STATE.isIPhone14Pro ? 300 : (window.innerWidth < 768 ? 400 : 600);
             CONFIG.camera.z = STATE.isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35);
         }
 
@@ -1182,6 +1525,19 @@
             mainGroup.rotation.x = STATE.rotation.x;
 
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
+            
+            // 始终更新星光粒子
+            updateStarParticles(dt);
+            
+            // 根据模式调整后期处理
+            if (bloomPass) {
+                if (STATE.mode === 'SCATTER' && STATE.fireworksActive) {
+                    // 烟花模式下增强辉光
+                    bloomPass.strength = CONFIG.effects.bloomStrength * 1.5;
+                } else {
+                    bloomPass.strength = CONFIG.effects.bloomStrength;
+                }
+            }
             
             if (composer && !STATE.isIPhone14Pro && window.innerWidth >= 768) {
                 composer.render();
@@ -1200,16 +1556,8 @@
 
         // 页面加载完成后初始化
         window.addEventListener('load', function() {
-            // 延迟执行以确保安全区域计算正确
             setTimeout(init, 100);
-            setTimeout(updateUIPosition, 500);
         });
-        
-        // 监听安全区域变化
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', updateUIPosition);
-        }
     </script>
 </body>
 </html>
-
