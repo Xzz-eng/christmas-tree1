@@ -187,13 +187,13 @@
             pointer-events: none;
             z-index: 10;
             padding: 0 15px;
-            text-shadow: 0 0 10px rgba(255, 200, 100, 0.8);
-            animation: pulseHint 3s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(255, 200, 100, 0.8);
+            animation: pulseHint 2s ease-in-out infinite;
         }
 
         @keyframes pulseHint {
-            0%, 100% { opacity: 0.6; text-shadow: 0 0 10px rgba(255, 200, 100, 0.5); }
-            50% { opacity: 1; text-shadow: 0 0 20px rgba(255, 200, 100, 1); }
+            0%, 100% { opacity: 0.7; text-shadow: 0 0 10px rgba(255, 200, 100, 0.6); }
+            50% { opacity: 1; text-shadow: 0 0 25px rgba(255, 200, 100, 1); }
         }
 
         /* 模式指示器 */
@@ -201,19 +201,20 @@
             position: fixed;
             top: calc(20px + env(safe-area-inset-top));
             right: 15px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: #ffcc66;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 13px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             pointer-events: none;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 204, 102, 0.4);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 204, 102, 0.6);
             font-weight: 600;
             z-index: 15;
-            box-shadow: 0 0 15px rgba(255, 204, 102, 0.3);
+            box-shadow: 0 0 30px rgba(255, 204, 102, 0.5);
+            text-shadow: 0 0 10px rgba(255, 204, 102, 0.8);
         }
 
         /* 上传按钮 */
@@ -222,28 +223,29 @@
             bottom: calc(80px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.8); 
-            border: 1px solid rgba(255, 204, 102, 0.6); 
+            background: rgba(20, 20, 20, 0.85); 
+            border: 1px solid rgba(255, 204, 102, 0.7); 
             color: #ffcc66; 
-            padding: 10px 20px; 
+            padding: 12px 24px; 
             cursor: pointer; 
             text-transform: uppercase; 
-            letter-spacing: 1.5px; 
-            font-size: 11px;
-            backdrop-filter: blur(10px);
-            border-radius: 6px;
+            letter-spacing: 2px; 
+            font-size: 12px;
+            backdrop-filter: blur(15px);
+            border-radius: 8px;
             touch-action: manipulation;
             font-weight: 600;
-            -webkit-tap-highlight-color: rgba(255, 204, 102, 0.3);
+            -webkit-tap-highlight-color: rgba(255, 204, 102, 0.4);
             z-index: 15;
             white-space: nowrap;
             transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255, 204, 102, 0.2);
+            box-shadow: 0 0 25px rgba(255, 204, 102, 0.4);
         }
 
         .upload-btn:active {
-            background: rgba(40, 40, 40, 0.9);
-            transform: translateX(-50%) scale(0.98);
+            background: rgba(40, 40, 40, 0.95);
+            transform: translateX(-50%) scale(0.96);
+            box-shadow: 0 0 35px rgba(255, 204, 102, 0.6);
         }
 
         /* 标题 */
@@ -253,12 +255,12 @@
             left: 50%;
             transform: translateX(-50%);
             color: #fff9e6; 
-            font-size: clamp(24px, 6vw, 28px); 
+            font-size: clamp(26px, 7vw, 30px); 
             margin: 0; 
             font-weight: 400; 
-            letter-spacing: 2px; 
-            text-shadow: 0 0 25px rgba(255, 249, 230, 0.8); 
-            background: linear-gradient(to bottom, #ffffff, #ffcc66, #ff9900);
+            letter-spacing: 3px; 
+            text-shadow: 0 0 30px rgba(255, 249, 230, 0.9); 
+            background: linear-gradient(to bottom, #ffffff, #ffcc66, #ff9900, #ff6600);
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -274,21 +276,51 @@
             position: fixed;
             bottom: calc(120px + env(safe-area-inset-bottom));
             right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 100, 100, 0.6);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 100, 100, 0.8);
             color: #ff6464;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             pointer-events: none;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             font-weight: 600;
             z-index: 15;
             opacity: 0;
             transition: opacity 0.5s ease;
-            box-shadow: 0 0 15px rgba(255, 100, 100, 0.3);
+            box-shadow: 0 0 30px rgba(255, 100, 100, 0.6);
+            text-shadow: 0 0 15px rgba(255, 100, 100, 0.8);
+            animation: fireworkPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fireworkPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 100, 100, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 100, 100, 0.9); }
+        }
+
+        /* 光泽感提示 */
+        .glow-effect {
+            position: fixed;
+            bottom: calc(160px + env(safe-area-inset-bottom));
+            right: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(100, 200, 255, 0.8);
+            color: #64c8ff;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+            backdrop-filter: blur(15px);
+            font-weight: 600;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            box-shadow: 0 0 25px rgba(100, 200, 255, 0.5);
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.8);
         }
     </style>
     
@@ -312,9 +344,10 @@
     <div class="dynamic-island-area"></div>
 
     <!-- UI元素 -->
-    <div class="app-title">圣诞烟花</div>
+    <div class="app-title">绚烂烟花</div>
     <div class="mode-indicator" id="mode-indicator">🎄 圣诞树</div>
-    <div class="firework-indicator" id="firework-indicator">🎆 烟花模式</div>
+    <div class="firework-indicator" id="firework-indicator">🎇 绚烂烟花</div>
+    <div class="glow-effect" id="glow-indicator">✨ 增强光泽</div>
     <div class="hint-overlay" id="hint-overlay">单指旋转 · 双指缩放</div>
     
     <label class="upload-btn" for="file-input">添加照片
@@ -328,12 +361,11 @@
         const isIPhone14Pro = /iPhone 14 Pro/.test(navigator.userAgent) || 
             (window.screen.width === 393 && window.screen.height === 852 && window.devicePixelRatio === 3);
         
-        // 配置
+        // 配置 - 增强光泽和鲜艳度
         const CONFIG = {
             colors: {
                 bg: 0x000000, 
                 champagneGold: 0xffd966, 
-                deepGreen: 0x03180a,     
                 accentRed: 0xff3366,     
                 starBlue: 0x64c8ff,
                 starWhite: 0xffffff,
@@ -345,12 +377,18 @@
                 fireworkYellow: 0xffcc00,
                 fireworkGreen: 0x33ff99,
                 fireworkBlue: 0x3366ff,
-                fireworkPurple: 0xcc66ff
+                fireworkPurple: 0xcc66ff,
+                neonPink: 0xff00ff,
+                neonCyan: 0x00ffff,
+                neonLime: 0xccff00,
+                neonAmber: 0xffbf00,
+                neonMagenta: 0xff00cc,
+                neonAqua: 0x00ffcc
             },
             particles: {
-                count: isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400),
-                dustCount: isIPhone14Pro ? 400 : (window.innerWidth < 768 ? 600 : 800),
-                starCount: isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400),
+                count: isIPhone14Pro ? 220 : (window.innerWidth < 768 ? 320 : 420),
+                dustCount: isIPhone14Pro ? 450 : (window.innerWidth < 768 ? 650 : 850),
+                starCount: isIPhone14Pro ? 220 : (window.innerWidth < 768 ? 320 : 420),
                 treeHeight: 14,  
                 treeRadius: 3.5    
             },
@@ -358,14 +396,23 @@
                 z: isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35)
             },
             effects: {
-                bloomStrength: 1.5,
-                bloomRadius: 0.8,
-                bloomThreshold: 0.4,
-                starDensity: 0.7,
-                twinkleSpeed: 1.5,
-                starSize: 0.1,
-                fireworkSpeed: 2.0,
-                fireworkIntensity: 1.5
+                // 增强光泽效果
+                bloomStrength: 1.8,
+                bloomRadius: 1.0,
+                bloomThreshold: 0.3,
+                fireworkBloomStrength: 2.5,
+                
+                starDensity: 0.8,
+                twinkleSpeed: 1.8,
+                starSize: 0.12,
+                
+                fireworkSpeed: 2.2,
+                fireworkIntensity: 1.8,
+                
+                // 光泽感增强
+                glowIntensity: 1.5,
+                saturation: 1.3,
+                contrast: 1.2
             }
         };
 
@@ -385,7 +432,8 @@
             autoRotate: true,
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             isIPhone14Pro: isIPhone14Pro,
-            fireworksActive: false
+            fireworksActive: false,
+            glowLights: []
         };
 
         let scene, camera, renderer, composer;
@@ -396,6 +444,7 @@
         let caneTexture;
         let starPoints;
         let bloomPass;
+        let glowTimer;
 
         // 检查Three.js是否加载成功
         function checkThreeLoaded() {
@@ -479,7 +528,7 @@
                         setTimeout(() => {
                             loader.style.display = 'none';
                             // 显示提示文字
-                            showHint('单击：烟花模式 · 双击：圣诞树 · 三击：聚焦照片');
+                            showHint('单击：绚烂烟花 · 双击：圣诞树 · 三击：聚焦照片');
                         }, 800);
                     }, 500);
                 }
@@ -511,7 +560,8 @@
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
                 alpha: false, 
-                powerPreference: "high-performance"
+                powerPreference: "high-performance",
+                logarithmicDepthBuffer: false
             });
             
             // 性能优化
@@ -523,7 +573,7 @@
             
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.toneMapping = THREE.ACESFilmicToneMapping; 
-            renderer.toneMappingExposure = 1.2; 
+            renderer.toneMappingExposure = 1.3; 
             renderer.shadowMap.enabled = false;
             container.appendChild(renderer.domElement);
 
@@ -537,11 +587,11 @@
             console.log('设置环境...');
             try {
                 // 添加环境光
-                const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+                const ambient = new THREE.AmbientLight(0xffffff, 0.9);
                 scene.add(ambient);
             } catch (error) {
                 console.warn('环境设置失败，使用简单环境光:', error);
-                const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+                const ambient = new THREE.AmbientLight(0xffffff, 0.9);
                 scene.add(ambient);
             }
         }
@@ -549,31 +599,33 @@
         function setupLights() {
             console.log('设置灯光...');
             
-            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            // 增强主光源
+            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambient);
 
-            const innerLight = new THREE.PointLight(0xffaa00, 2.0, 15);
+            const innerLight = new THREE.PointLight(0xffaa00, 2.5, 20);
             innerLight.position.set(0, 4, 0);
+            innerLight.decay = 0.8;
             mainGroup.add(innerLight);
 
             // 添加多个彩色点光源，增强光泽感
             const colorfulLights = [
-                { color: 0xff3366, position: [-5, 8, -5], intensity: 0.8 },
-                { color: 0x33ff99, position: [5, 6, -3], intensity: 0.6 },
-                { color: 0x3366ff, position: [-3, 7, 5], intensity: 0.7 },
-                { color: 0xffcc00, position: [4, 5, 4], intensity: 0.9 },
-                { color: 0xcc66ff, position: [0, 9, 0], intensity: 1.0 }
+                { color: 0xff3366, position: [-5, 8, -5], intensity: 1.2 },
+                { color: 0x33ff99, position: [5, 6, -3], intensity: 0.9 },
+                { color: 0x3366ff, position: [-3, 7, 5], intensity: 1.1 },
+                { color: 0xffcc00, position: [4, 5, 4], intensity: 1.3 },
+                { color: 0xcc66ff, position: [0, 9, 0], intensity: 1.5 }
             ];
 
             colorfulLights.forEach(light => {
-                const pointLight = new THREE.PointLight(light.color, light.intensity, 20);
+                const pointLight = new THREE.PointLight(light.color, light.intensity, 25);
                 pointLight.position.set(light.position[0], light.position[1], light.position[2]);
-                pointLight.decay = 1.0;
+                pointLight.decay = 0.7;
                 scene.add(pointLight);
             });
 
             // 添加星光环境光
-            const starAmbient = new THREE.AmbientLight(CONFIG.colors.starBlue, 0.2);
+            const starAmbient = new THREE.AmbientLight(CONFIG.colors.starBlue, 0.3);
             scene.add(starAmbient);
         }
 
@@ -624,22 +676,31 @@
         function createTextures() {
             console.log('创建纹理...');
             
-            // 创建拐杖糖纹理
+            // 创建拐杖糖纹理 - 增强颜色
             const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
+            canvas.width = 128;
+            canvas.height = 128;
             const ctx = canvas.getContext('2d');
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 128, 128);
+            gradient.addColorStop(0, '#ff3366');
+            gradient.addColorStop(0.5, '#ff9933');
+            gradient.addColorStop(1, '#ffcc00');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0,0,128,128);
+            
+            // 添加条纹图案
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0,0,64,64);
-            ctx.fillStyle = '#ff3366'; 
             ctx.beginPath();
-            for(let i=-64; i<128; i+=16) {
+            for(let i=-128; i<256; i+=32) {
                 ctx.moveTo(i, 0); 
-                ctx.lineTo(i+16, 64); 
-                ctx.lineTo(i+8, 64); 
-                ctx.lineTo(i-8, 0);
+                ctx.lineTo(i+32, 128); 
+                ctx.lineTo(i+16, 128); 
+                ctx.lineTo(i-16, 0);
             }
             ctx.fill();
+            
             caneTexture = new THREE.CanvasTexture(canvas);
             caneTexture.wrapS = THREE.RepeatWrapping;
             caneTexture.wrapT = THREE.RepeatWrapping;
@@ -668,37 +729,55 @@
                 this.fireworkMode = false;
                 this.fireworkVelocity = new THREE.Vector3();
                 this.fireworkLife = 1.0;
-                this.fireworkDecay = 0.02;
+                this.fireworkDecay = 0.015;
                 this.originalPos = new THREE.Vector3();
                 this.originalScale = this.baseScale;
+                this.glowIntensity = 1.0;
+                this.colorPhase = Math.random() * Math.PI * 2;
                 
-                // 为每种粒子添加随机颜色
-                this.assignRandomColor();
+                // 为每种粒子添加鲜艳颜色
+                this.assignVibrantColor();
 
                 this.calculatePositions();
             }
 
-            assignRandomColor() {
+            assignVibrantColor() {
+                // 更鲜艳的颜色组合
+                const vibrantColors = [
+                    {color: CONFIG.colors.neonPink, emissive: 0xff00ff},
+                    {color: CONFIG.colors.neonCyan, emissive: 0x00ffff},
+                    {color: CONFIG.colors.neonLime, emissive: 0xccff00},
+                    {color: CONFIG.colors.neonAmber, emissive: 0xffbf00},
+                    {color: CONFIG.colors.neonMagenta, emissive: 0xff00cc},
+                    {color: CONFIG.colors.neonAqua, emissive: 0x00ffcc},
+                    {color: CONFIG.colors.fireworkRed, emissive: 0xff3366},
+                    {color: CONFIG.colors.fireworkOrange, emissive: 0xff9933},
+                    {color: CONFIG.colors.fireworkYellow, emissive: 0xffcc00},
+                    {color: CONFIG.colors.fireworkGreen, emissive: 0x33ff99},
+                    {color: CONFIG.colors.fireworkBlue, emissive: 0x3366ff},
+                    {color: CONFIG.colors.fireworkPurple, emissive: 0xcc66ff}
+                ];
+                
+                const colorSet = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+                
                 if (this.type === 'GOLD_BOX' || this.type === 'GOLD_SPHERE') {
-                    // 金色粒子保持金色，但增加一点变化
+                    // 金色粒子改为更鲜艳的金色
+                    this.mesh.material.color.setHex(0xffcc00);
                     this.mesh.material.emissive.setHex(0xffcc00);
-                    this.mesh.material.emissiveIntensity = 0.8;
+                    this.mesh.material.emissiveIntensity = 1.2;
                 } else if (this.type === 'RED') {
-                    this.mesh.material.color.setHex(CONFIG.colors.fireworkRed);
-                    this.mesh.material.emissive.setHex(CONFIG.colors.fireworkRed);
-                    this.mesh.material.emissiveIntensity = 0.6;
+                    this.mesh.material.color.setHex(colorSet.color);
+                    this.mesh.material.emissive.setHex(colorSet.emissive);
+                    this.mesh.material.emissiveIntensity = 0.9;
                 } else if (this.type === 'BOX') {
-                    // 绿色盒子改为更鲜艳的颜色
-                    const colors = [
-                        CONFIG.colors.fireworkGreen,
-                        CONFIG.colors.fireworkBlue,
-                        CONFIG.colors.fireworkPurple
-                    ];
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    this.mesh.material.color.setHex(color);
-                    this.mesh.material.emissive.setHex(color);
-                    this.mesh.material.emissiveIntensity = 0.5;
+                    this.mesh.material.color.setHex(colorSet.color);
+                    this.mesh.material.emissive.setHex(colorSet.emissive);
+                    this.mesh.material.emissiveIntensity = 0.8;
                 }
+                
+                // 记录原始颜色
+                this.originalColor = new THREE.Color(colorSet.color);
+                this.originalEmissive = new THREE.Color(colorSet.emissive);
             }
 
             calculatePositions() {
@@ -728,14 +807,19 @@
             enterFireworkMode() {
                 this.fireworkMode = true;
                 this.fireworkLife = 1.0;
+                this.glowIntensity = 1.0;
+                
+                // 更强的初始速度
                 this.fireworkVelocity.set(
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 8
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 12
                 );
                 
-                // 在烟花模式下增加自发光
-                this.mesh.material.emissiveIntensity = 1.2;
+                // 在烟花模式下大幅增加自发光
+                this.mesh.material.emissiveIntensity = 2.0;
+                this.mesh.material.metalness = 0.9;
+                this.mesh.material.roughness = 0.1;
                 
                 // 记录原始位置
                 this.originalPos.copy(this.mesh.position);
@@ -744,13 +828,12 @@
             exitFireworkMode() {
                 this.fireworkMode = false;
                 this.fireworkLife = 1.0;
+                this.glowIntensity = 1.0;
                 
-                // 恢复原始自发光强度
-                if (this.type === 'GOLD_BOX' || this.type === 'GOLD_SPHERE') {
-                    this.mesh.material.emissiveIntensity = 0.8;
-                } else {
-                    this.mesh.material.emissiveIntensity = 0.5;
-                }
+                // 恢复原始材质
+                this.mesh.material.emissiveIntensity = 0.8;
+                this.mesh.material.metalness = 0.7;
+                this.mesh.material.roughness = 0.3;
             }
 
             update(dt, mode, focusTargetMesh) {
@@ -782,12 +865,12 @@
                     this.mesh.rotation.z += this.spinSpeed.z * dt;
                     
                     // 在星空模式下增加闪烁效果
-                    const scaleMultiplier = 0.8 + 0.4 * Math.sin(clock.elapsedTime * 2 + this.mesh.id);
+                    const scaleMultiplier = 0.7 + 0.6 * Math.sin(clock.elapsedTime * 2.5 + this.mesh.id);
                     this.mesh.scale.lerp(new THREE.Vector3(
                         this.baseScale * scaleMultiplier,
                         this.baseScale * scaleMultiplier,
                         this.baseScale * scaleMultiplier
-                    ), 5 * dt);
+                    ), 8 * dt);
                 } else if (mode === 'TREE') {
                     this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
                     this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
@@ -800,12 +883,12 @@
 
                 let s = this.baseScale;
                 if (this.isDust) {
-                    s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 1.5 + this.mesh.id));
+                    s = this.baseScale * (0.6 + 0.8 * Math.sin(clock.elapsedTime * 2 + this.mesh.id));
                     if (mode === 'TREE') s = 0; 
                 } else if (mode === 'SCATTER' && this.type === 'PHOTO') {
-                    s = this.baseScale * 1.3; 
+                    s = this.baseScale * 1.5; 
                 } else if (mode === 'FOCUS') {
-                    if (this.mesh === focusTargetMesh) s = 2.0; 
+                    if (this.mesh === focusTargetMesh) s = 2.2; 
                     else s = this.baseScale * 0.4; 
                 }
                 
@@ -815,32 +898,61 @@
             }
 
             updateFirework(dt) {
+                const time = clock.elapsedTime;
+                
                 // 更新位置
                 this.mesh.position.add(this.fireworkVelocity.clone().multiplyScalar(dt * CONFIG.effects.fireworkSpeed));
                 
-                // 应用阻力
-                this.fireworkVelocity.multiplyScalar(0.99);
+                // 应用阻力 - 更小的阻力，让运动更持久
+                this.fireworkVelocity.multiplyScalar(0.995);
                 
                 // 边界反弹
-                const bounds = 15;
-                if (Math.abs(this.mesh.position.x) > bounds) this.fireworkVelocity.x *= -0.9;
-                if (Math.abs(this.mesh.position.y) > bounds) this.fireworkVelocity.y *= -0.9;
-                if (Math.abs(this.mesh.position.z) > bounds) this.fireworkVelocity.z *= -0.9;
+                const bounds = 20;
+                if (Math.abs(this.mesh.position.x) > bounds) {
+                    this.fireworkVelocity.x *= -0.85;
+                    this.mesh.position.x = Math.sign(this.mesh.position.x) * bounds;
+                }
+                if (Math.abs(this.mesh.position.y) > bounds) {
+                    this.fireworkVelocity.y *= -0.85;
+                    this.mesh.position.y = Math.sign(this.mesh.position.y) * bounds;
+                }
+                if (Math.abs(this.mesh.position.z) > bounds) {
+                    this.fireworkVelocity.z *= -0.85;
+                    this.mesh.position.z = Math.sign(this.mesh.position.z) * bounds;
+                }
                 
                 // 更新旋转
-                this.mesh.rotation.x += this.spinSpeed.x * dt * 2;
-                this.mesh.rotation.y += this.spinSpeed.y * dt * 2;
-                this.mesh.rotation.z += this.spinSpeed.z * dt * 2;
+                this.mesh.rotation.x += this.spinSpeed.x * dt * 3;
+                this.mesh.rotation.y += this.spinSpeed.y * dt * 3;
+                this.mesh.rotation.z += this.spinSpeed.z * dt * 3;
                 
-                // 闪烁效果
-                const time = clock.elapsedTime;
-                const pulse = Math.sin(time * 5 + this.mesh.id) * 0.5 + 0.5;
-                const scale = this.originalScale * (0.7 + 0.6 * pulse);
-                this.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 10 * dt);
+                // 脉动和闪烁效果
+                const pulse1 = Math.sin(time * 6 + this.mesh.id) * 0.5 + 0.5;
+                const pulse2 = Math.sin(time * 3 + this.mesh.id * 0.5) * 0.3 + 0.7;
+                const pulse3 = Math.sin(time * 8 + this.mesh.id * 2) * 0.2 + 0.8;
+                const combinedPulse = (pulse1 + pulse2 + pulse3) / 3;
                 
-                // 颜色闪烁
-                const colorIntensity = Math.sin(time * 3 + this.mesh.id * 0.1) * 0.3 + 0.7;
-                this.mesh.material.color.multiplyScalar(colorIntensity);
+                const scale = this.originalScale * (0.5 + 1.0 * combinedPulse);
+                this.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 15 * dt);
+                
+                // 颜色动态变化
+                this.colorPhase += dt * 2;
+                const colorShift = Math.sin(this.colorPhase) * 0.3 + 0.7;
+                const hueShift = Math.sin(time * 2 + this.mesh.id) * 0.2;
+                
+                // 创建鲜艳的颜色变化
+                const vibrantColor = this.originalColor.clone();
+                vibrantColor.multiplyScalar(colorShift);
+                vibrantColor.r += hueShift * 0.3;
+                vibrantColor.g += Math.sin(time * 1.5) * 0.2;
+                vibrantColor.b += Math.cos(time * 2) * 0.2;
+                
+                this.mesh.material.color.copy(vibrantColor);
+                this.mesh.material.emissive.copy(vibrantColor);
+                
+                // 光泽感强度变化
+                this.glowIntensity = 1.5 + 0.8 * Math.sin(time * 4 + this.mesh.id);
+                this.mesh.material.emissiveIntensity = this.glowIntensity;
                 
                 // 更新生命周期
                 this.fireworkLife -= this.fireworkDecay * dt;
@@ -853,96 +965,62 @@
         function createParticles() {
             console.log('创建粒子...');
             
-            const sphereGeo = new THREE.SphereGeometry(0.25, 8, 8);
+            const sphereGeo = new THREE.SphereGeometry(0.25, 12, 12);
             const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3); 
             
-            const goldMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.champagneGold,
-                metalness: 0.8, 
-                roughness: 0.2,
-                emissive: CONFIG.colors.champagneGold,
-                emissiveIntensity: 0.8
-            });
+            // 创建高光泽材质
+            const createGlowingMaterial = (color, emissiveColor) => {
+                return new THREE.MeshStandardMaterial({
+                    color: color,
+                    metalness: 0.85,
+                    roughness: 0.15,
+                    emissive: emissiveColor,
+                    emissiveIntensity: 1.0,
+                    envMapIntensity: 1.5
+                });
+            };
 
-            const redMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.accentRed,
-                metalness: 0.7,
-                roughness: 0.3,
-                emissive: CONFIG.colors.fireworkRed,
-                emissiveIntensity: 0.6
-            });
-            
-            const candyMat = new THREE.MeshStandardMaterial({ 
-                map: caneTexture, 
-                metalness: 0.6,
-                roughness: 0.4,
-                emissive: 0xff6666,
-                emissiveIntensity: 0.5
-            });
-
-            // 创建多种颜色的材质
-            const colorfulMats = [
-                new THREE.MeshStandardMaterial({
-                    color: CONFIG.colors.fireworkGreen,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: CONFIG.colors.fireworkGreen,
-                    emissiveIntensity: 0.5
-                }),
-                new THREE.MeshStandardMaterial({
-                    color: CONFIG.colors.fireworkBlue,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: CONFIG.colors.fireworkBlue,
-                    emissiveIntensity: 0.5
-                }),
-                new THREE.MeshStandardMaterial({
-                    color: CONFIG.colors.fireworkPurple,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: CONFIG.colors.fireworkPurple,
-                    emissiveIntensity: 0.5
-                }),
-                new THREE.MeshStandardMaterial({
-                    color: CONFIG.colors.fireworkOrange,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: CONFIG.colors.fireworkOrange,
-                    emissiveIntensity: 0.5
-                }),
-                new THREE.MeshStandardMaterial({
-                    color: CONFIG.colors.fireworkYellow,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: CONFIG.colors.fireworkYellow,
-                    emissiveIntensity: 0.5
-                })
+            // 创建多种鲜艳颜色的材质
+            const vibrantMats = [
+                createGlowingMaterial(CONFIG.colors.neonPink, 0xff00ff),
+                createGlowingMaterial(CONFIG.colors.neonCyan, 0x00ffff),
+                createGlowingMaterial(CONFIG.colors.neonLime, 0xccff00),
+                createGlowingMaterial(CONFIG.colors.neonAmber, 0xffbf00),
+                createGlowingMaterial(CONFIG.colors.neonMagenta, 0xff00cc),
+                createGlowingMaterial(CONFIG.colors.neonAqua, 0x00ffcc),
+                createGlowingMaterial(CONFIG.colors.fireworkRed, 0xff3366),
+                createGlowingMaterial(CONFIG.colors.fireworkOrange, 0xff9933),
+                createGlowingMaterial(CONFIG.colors.fireworkYellow, 0xffcc00),
+                createGlowingMaterial(CONFIG.colors.fireworkGreen, 0x33ff99),
+                createGlowingMaterial(CONFIG.colors.fireworkBlue, 0x3366ff),
+                createGlowingMaterial(CONFIG.colors.fireworkPurple, 0xcc66ff)
             ];
 
             for (let i = 0; i < CONFIG.particles.count; i++) {
                 const rand = Math.random();
                 let mesh, type;
                 
-                if (rand < 0.40) {
+                if (rand < 0.45) {
                     // 彩色方块
-                    const matIndex = Math.floor(Math.random() * colorfulMats.length);
-                    mesh = new THREE.Mesh(boxGeo, colorfulMats[matIndex]);
+                    const matIndex = Math.floor(Math.random() * vibrantMats.length);
+                    mesh = new THREE.Mesh(boxGeo, vibrantMats[matIndex]);
                     type = 'BOX';
-                } else if (rand < 0.70) {
+                } else if (rand < 0.75) {
                     // 金色方块
-                    mesh = new THREE.Mesh(boxGeo, goldMat);
+                    mesh = new THREE.Mesh(boxGeo, createGlowingMaterial(0xffcc00, 0xffcc00));
                     type = 'GOLD_BOX';
                 } else if (rand < 0.90) {
                     // 金色球体
-                    mesh = new THREE.Mesh(sphereGeo, goldMat);
+                    mesh = new THREE.Mesh(sphereGeo, createGlowingMaterial(0xffcc00, 0xffcc00));
                     type = 'GOLD_SPHERE';
                 } else {
                     // 红色球体
-                    mesh = new THREE.Mesh(sphereGeo, redMat);
+                    const matIndex = Math.floor(Math.random() * vibrantMats.length);
+                    mesh = new THREE.Mesh(sphereGeo, vibrantMats[matIndex]);
                     type = 'RED';
                 }
 
-                const s = 0.2 + Math.random() * 0.3;
+                const s = 0.25 + Math.random() * 0.35;
                 mesh.scale.set(s,s,s);
                 mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
                 
@@ -950,14 +1028,14 @@
                 particleSystem.push(new Particle(mesh, type, false));
             }
 
-            // 创建发光星星
-            const starGeo = new THREE.OctahedronGeometry(0.6, 0);
+            // 创建发光星星 - 增强光泽感
+            const starGeo = new THREE.IcosahedronGeometry(0.6, 1);
             const starMat = new THREE.MeshStandardMaterial({
                 color: 0xffdd88, 
                 emissive: 0xffaa00, 
-                emissiveIntensity: 2.0,
-                metalness: 0.8,
-                roughness: 0.1
+                emissiveIntensity: 3.0,
+                metalness: 0.9,
+                roughness: 0.05
             });
             const star = new THREE.Mesh(starGeo, starMat);
             star.position.set(0, CONFIG.particles.treeHeight/2 + 0.5, 0);
@@ -971,27 +1049,34 @@
         function createDust() {
             console.log('创建灰尘粒子...');
             
-            const geo = new THREE.TetrahedronGeometry(0.03, 0);
+            const geo = new THREE.TetrahedronGeometry(0.04, 0);
             
             for(let i=0; i<CONFIG.particles.dustCount; i++) {
                 const colorRand = Math.random();
-                let color;
-                if (colorRand < 0.3) {
+                let color, emissive;
+                if (colorRand < 0.25) {
                     color = CONFIG.colors.starBlue;
-                } else if (colorRand < 0.6) {
+                    emissive = 0x64c8ff;
+                } else if (colorRand < 0.5) {
                     color = CONFIG.colors.starWhite;
-                } else {
+                    emissive = 0xffffff;
+                } else if (colorRand < 0.75) {
                     color = CONFIG.colors.starYellow;
+                    emissive = 0xfff4b3;
+                } else {
+                    color = CONFIG.colors.starPink;
+                    emissive = 0xffb6c1;
                 }
                 
                 const mat = new THREE.MeshBasicMaterial({ 
                     color: color, 
                     transparent: true, 
-                    opacity: 0.5 
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending
                 });
                 
                 const mesh = new THREE.Mesh(geo, mat);
-                mesh.scale.setScalar(0.2 + Math.random());
+                mesh.scale.setScalar(0.25 + Math.random() * 0.3);
                 mainGroup.add(mesh);
                 particleSystem.push(new Particle(mesh, 'DUST', true));
             }
@@ -1002,17 +1087,18 @@
         function createStarParticles() {
             console.log('创建星光粒子...');
             
-            const starCount = Math.floor(CONFIG.particles.starCount * 0.7);
+            const starCount = Math.floor(CONFIG.particles.starCount * 0.8);
             const positions = new Float32Array(starCount * 3);
             const colors = new Float32Array(starCount * 3);
             const sizes = new Float32Array(starCount);
             const twinkleSpeeds = new Float32Array(starCount);
             const originalY = new Float32Array(starCount);
             const rotationSpeeds = new Float32Array(starCount);
+            const glowIntensities = new Float32Array(starCount);
 
             for (let i = 0; i < starCount; i++) {
                 // 随机位置
-                const radius = 15 + Math.random() * 30;
+                const radius = 15 + Math.random() * 35;
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
                 
@@ -1022,19 +1108,21 @@
                 
                 originalY[i] = positions[i * 3 + 1];
                 
-                // 随机颜色
+                // 随机鲜艳颜色
                 const colorRand = Math.random();
                 let color;
-                if (colorRand < 0.3) {
-                    color = new THREE.Color(CONFIG.colors.starBlue);
-                } else if (colorRand < 0.5) {
-                    color = new THREE.Color(CONFIG.colors.starWhite);
-                } else if (colorRand < 0.7) {
-                    color = new THREE.Color(CONFIG.colors.starYellow);
+                if (colorRand < 0.2) {
+                    color = new THREE.Color(CONFIG.colors.neonCyan);
+                } else if (colorRand < 0.4) {
+                    color = new THREE.Color(CONFIG.colors.neonPink);
+                } else if (colorRand < 0.6) {
+                    color = new THREE.Color(CONFIG.colors.neonLime);
+                } else if (colorRand < 0.75) {
+                    color = new THREE.Color(CONFIG.colors.neonAmber);
                 } else if (colorRand < 0.85) {
-                    color = new THREE.Color(CONFIG.colors.starPink);
+                    color = new THREE.Color(CONFIG.colors.neonMagenta);
                 } else {
-                    color = new THREE.Color(CONFIG.colors.starPurple);
+                    color = new THREE.Color(CONFIG.colors.neonAqua);
                 }
                 
                 colors[i * 3] = color.r;
@@ -1042,13 +1130,16 @@
                 colors[i * 3 + 2] = color.b;
                 
                 // 随机大小
-                sizes[i] = 0.1 * (0.5 + Math.random());
+                sizes[i] = CONFIG.effects.starSize * (0.6 + Math.random() * 0.8);
                 
                 // 随机闪烁速度
-                twinkleSpeeds[i] = 0.8 + Math.random() * 3;
+                twinkleSpeeds[i] = 1.0 + Math.random() * 4;
                 
                 // 随机旋转速度
-                rotationSpeeds[i] = (Math.random() - 0.5) * 0.8;
+                rotationSpeeds[i] = (Math.random() - 0.5) * 1.0;
+                
+                // 随机发光强度
+                glowIntensities[i] = 0.8 + Math.random() * 1.2;
             }
 
             const geometry = new THREE.BufferGeometry();
@@ -1057,10 +1148,10 @@
             geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
             
             // 存储额外属性
-            geometry.userData = { twinkleSpeeds, originalY, rotationSpeeds };
+            geometry.userData = { twinkleSpeeds, originalY, rotationSpeeds, glowIntensities };
 
             const material = new THREE.PointsMaterial({
-                size: 0.12,
+                size: 0.15,
                 vertexColors: true,
                 transparent: true,
                 opacity: 1.0,
@@ -1081,16 +1172,28 @@
             canvas.width = 128;
             canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#050505'; 
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 128, 128);
+            gradient.addColorStop(0, '#ff3366');
+            gradient.addColorStop(0.5, '#ffcc00');
+            gradient.addColorStop(1, '#33ff99');
+            ctx.fillStyle = gradient;
             ctx.fillRect(0,0,128,128);
+            
             ctx.strokeStyle = '#ffcc66'; 
-            ctx.lineWidth = 4; 
+            ctx.lineWidth = 5; 
+            ctx.lineJoin = 'round';
             ctx.strokeRect(4,4,120,120);
-            ctx.font = '300 16px "Times New Roman"'; 
-            ctx.fillStyle = '#ffcc66';
+            
+            ctx.font = 'bold 18px "Arial"'; 
+            ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'center'; 
+            ctx.shadowColor = '#ffcc66';
+            ctx.shadowBlur = 15;
             ctx.fillText("圣诞", 64, 55);
-            ctx.fillText("快乐", 64, 75);
+            ctx.fillText("快乐", 64, 85);
+            ctx.shadowBlur = 0;
             
             const tex = new THREE.CanvasTexture(canvas);
             addPhotoToScene(tex);
@@ -1100,10 +1203,10 @@
             const frameGeo = new THREE.BoxGeometry(0.9, 0.9, 0.02);
             const frameMat = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.champagneGold, 
-                metalness: 0.8, 
-                roughness: 0.3,
+                metalness: 0.85, 
+                roughness: 0.2,
                 emissive: CONFIG.colors.champagneGold,
-                emissiveIntensity: 0.5
+                emissiveIntensity: 0.8
             });
             const frame = new THREE.Mesh(frameGeo, frameMat);
 
@@ -1111,7 +1214,7 @@
             const photoMat = new THREE.MeshBasicMaterial({ 
                 map: texture,
                 emissive: 0xffffff,
-                emissiveIntensity: 0.3
+                emissiveIntensity: 0.5
             });
             const photo = new THREE.Mesh(photoGeo, photoMat);
             photo.position.z = 0.015;
@@ -1120,7 +1223,7 @@
             group.add(frame);
             group.add(photo);
             
-            const s = 0.4;
+            const s = 0.45;
             group.scale.set(s,s,s);
             
             photoMeshGroup.add(group);
@@ -1151,7 +1254,15 @@
                         canvas.height = size;
                         const ctx = canvas.getContext('2d');
                         
-                        const scale = Math.max(size/img.width, size/img.height);
+                        // 添加光泽效果边框
+                        const gradient = ctx.createLinearGradient(0, 0, size, size);
+                        gradient.addColorStop(0, '#ff3366');
+                        gradient.addColorStop(0.5, '#ffcc00');
+                        gradient.addColorStop(1, '#33ff99');
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(0,0,size,size);
+                        
+                        const scale = Math.max(size/img.width, size/img.height) * 0.9;
                         const x = (size - img.width * scale) / 2;
                         const y = (size - img.height * scale) / 2;
                         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
@@ -1166,15 +1277,55 @@
             });
         }
 
+        function createGlowLights() {
+            // 清除现有光泽灯光
+            STATE.glowLights.forEach(light => {
+                scene.remove(light);
+            });
+            STATE.glowLights = [];
+            
+            // 创建多色光泽灯光
+            const glowColors = [
+                0xff3366, 0xff9933, 0xffcc00, 0x33ff99,
+                0x3366ff, 0xcc66ff, 0xff00ff, 0x00ffff
+            ];
+            
+            for (let i = 0; i < 12; i++) {
+                const color = glowColors[Math.floor(Math.random() * glowColors.length)];
+                const pointLight = new THREE.PointLight(color, 2.0 + Math.random() * 3, 30);
+                
+                // 随机位置，但避免过于集中
+                pointLight.position.set(
+                    (Math.random() - 0.5) * 25,
+                    Math.random() * 15,
+                    (Math.random() - 0.5) * 25
+                );
+                
+                pointLight.decay = 0.5;
+                scene.add(pointLight);
+                STATE.glowLights.push(pointLight);
+            }
+        }
+
+        function removeGlowLights() {
+            STATE.glowLights.forEach(light => {
+                scene.remove(light);
+            });
+            STATE.glowLights = [];
+        }
+
         function activateFireworks() {
             // 激活烟花效果
             STATE.fireworksActive = true;
             
-            // 随机选择一些粒子进入烟花模式
+            // 创建光泽灯光
+            createGlowLights();
+            
+            // 随机选择粒子进入烟花模式
             const particlesToActivate = particleSystem
                 .filter(p => !p.isDust && p.type !== 'PHOTO')
                 .sort(() => Math.random() - 0.5)
-                .slice(0, Math.floor(particleSystem.length * 0.6));
+                .slice(0, Math.floor(particleSystem.length * 0.75));
             
             particlesToActivate.forEach(p => {
                 p.enterFireworkMode();
@@ -1186,18 +1337,36 @@
                 indicator.style.opacity = '1';
                 setTimeout(() => {
                     indicator.style.opacity = '0';
+                }, 4000);
+            }
+            
+            // 显示光泽效果提示
+            const glowIndicator = document.getElementById('glow-indicator');
+            if (glowIndicator) {
+                glowIndicator.style.opacity = '1';
+                clearTimeout(glowTimer);
+                glowTimer = setTimeout(() => {
+                    glowIndicator.style.opacity = '0';
                 }, 3000);
             }
             
-            // 增强辉光效果
+            // 大幅增强辉光效果
             if (bloomPass) {
-                bloomPass.strength = CONFIG.effects.bloomStrength * 1.5;
+                bloomPass.strength = CONFIG.effects.fireworkBloomStrength;
+                bloomPass.radius = 1.2;
+                bloomPass.threshold = 0.2;
             }
+            
+            // 增加渲染器曝光度
+            renderer.toneMappingExposure = 1.6;
         }
 
         function deactivateFireworks() {
             // 停用烟花效果
             STATE.fireworksActive = false;
+            
+            // 移除光泽灯光
+            removeGlowLights();
             
             // 所有粒子退出烟花模式
             particleSystem.forEach(p => {
@@ -1209,7 +1378,29 @@
             // 恢复辉光效果
             if (bloomPass) {
                 bloomPass.strength = CONFIG.effects.bloomStrength;
+                bloomPass.radius = CONFIG.effects.bloomRadius;
+                bloomPass.threshold = CONFIG.effects.bloomThreshold;
             }
+            
+            // 恢复渲染器曝光度
+            renderer.toneMappingExposure = 1.3;
+        }
+
+        function updateGlowLights(dt) {
+            if (!STATE.fireworksActive) return;
+            
+            const time = clock.elapsedTime;
+            
+            STATE.glowLights.forEach((light, index) => {
+                // 灯光脉动
+                const pulse = Math.sin(time * 3 + index) * 0.3 + 0.7;
+                light.intensity = 2.0 + pulse * 2;
+                
+                // 轻微移动
+                light.position.x += Math.sin(time * 2 + index) * dt * 2;
+                light.position.y += Math.cos(time * 1.5 + index) * dt * 1.5;
+                light.position.z += Math.sin(time * 2.5 + index) * dt * 2;
+            });
         }
 
         function setupTouchEvents() {
@@ -1287,7 +1478,7 @@
                     camera.position.z = THREE.MathUtils.clamp(
                         camera.position.z / scale, 
                         8, 
-                        30
+                        35
                     );
                     
                     STATE.touch.pinchStart = pinchCurrent;
@@ -1332,7 +1523,7 @@
                         STATE.focusTarget = null;
                         STATE.autoRotate = false;
                         activateFireworks();
-                        showHint('烟花模式：绚丽绽放');
+                        showHint('绚烂烟花：增强光泽与色彩');
                         break;
                         
                     case 2:
@@ -1341,7 +1532,7 @@
                         STATE.focusTarget = null;
                         STATE.autoRotate = true;
                         deactivateFireworks();
-                        showHint('圣诞树模式：自动旋转');
+                        showHint('圣诞树模式：金色旋转');
                         break;
                         
                     case 3:
@@ -1353,7 +1544,7 @@
                             const randomIndex = Math.floor(Math.random() * photos.length);
                             STATE.focusTarget = photos[randomIndex].mesh;
                             STATE.autoRotate = false;
-                            showHint('聚焦模式：随机选中一张照片');
+                            showHint('聚焦模式：突出照片');
                         } else {
                             showHint('请先添加照片');
                         }
@@ -1384,21 +1575,21 @@
             switch(STATE.mode) {
                 case 'TREE':
                     indicator.textContent = '🎄 圣诞树';
-                    indicator.style.borderColor = 'rgba(255, 204, 102, 0.4)';
+                    indicator.style.borderColor = 'rgba(255, 204, 102, 0.6)';
                     indicator.style.color = '#ffcc66';
-                    indicator.style.boxShadow = '0 0 15px rgba(255, 204, 102, 0.3)';
+                    indicator.style.boxShadow = '0 0 30px rgba(255, 204, 102, 0.5)';
                     break;
                 case 'SCATTER':
-                    indicator.textContent = '🎆 烟花';
-                    indicator.style.borderColor = 'rgba(255, 100, 100, 0.6)';
+                    indicator.textContent = '🎇 绚烂烟花';
+                    indicator.style.borderColor = 'rgba(255, 100, 100, 0.8)';
                     indicator.style.color = '#ff6464';
-                    indicator.style.boxShadow = '0 0 20px rgba(255, 100, 100, 0.5)';
+                    indicator.style.boxShadow = '0 0 40px rgba(255, 100, 100, 0.7)';
                     break;
                 case 'FOCUS':
                     indicator.textContent = '📸 聚焦照片';
-                    indicator.style.borderColor = 'rgba(100, 200, 255, 0.6)';
+                    indicator.style.borderColor = 'rgba(100, 200, 255, 0.8)';
                     indicator.style.color = '#64c8ff';
-                    indicator.style.boxShadow = '0 0 15px rgba(100, 200, 255, 0.3)';
+                    indicator.style.boxShadow = '0 0 30px rgba(100, 200, 255, 0.6)';
                     break;
             }
         }
@@ -1409,10 +1600,10 @@
                 hintOverlay.textContent = message;
                 hintOverlay.style.opacity = '1';
                 
-                // 3秒后恢复默认提示
+                // 4秒后恢复默认提示
                 setTimeout(() => {
                     hintOverlay.textContent = '单指旋转 · 双指缩放';
-                }, 3000);
+                }, 4000);
             }
         }
 
@@ -1426,9 +1617,9 @@
             }
             
             // 更新配置
-            CONFIG.particles.count = STATE.isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400);
-            CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 400 : (window.innerWidth < 768 ? 600 : 800);
-            CONFIG.particles.starCount = STATE.isIPhone14Pro ? 200 : (window.innerWidth < 768 ? 300 : 400);
+            CONFIG.particles.count = STATE.isIPhone14Pro ? 220 : (window.innerWidth < 768 ? 320 : 420);
+            CONFIG.particles.dustCount = STATE.isIPhone14Pro ? 450 : (window.innerWidth < 768 ? 650 : 850);
+            CONFIG.particles.starCount = STATE.isIPhone14Pro ? 220 : (window.innerWidth < 768 ? 320 : 420);
             CONFIG.camera.z = STATE.isIPhone14Pro ? 22 : (window.innerWidth < 768 ? 25 : 35);
         }
 
@@ -1448,14 +1639,13 @@
             // 更新星光粒子
             updateStarParticles(dt);
             
+            // 更新光泽灯光
+            updateGlowLights(dt);
+            
             // 根据模式调整后期处理
-            if (bloomPass) {
-                if (STATE.mode === 'SCATTER' && STATE.fireworksActive) {
-                    // 烟花模式下增强辉光
-                    bloomPass.strength = 1.5 * 1.5;
-                } else {
-                    bloomPass.strength = 1.5;
-                }
+            if (bloomPass && STATE.mode === 'SCATTER' && STATE.fireworksActive) {
+                // 烟花模式下进一步增强辉光
+                bloomPass.strength = CONFIG.effects.fireworkBloomStrength + Math.sin(clock.elapsedTime) * 0.3;
             }
             
             if (composer && !STATE.isIPhone14Pro && window.innerWidth >= 768) {
@@ -1471,13 +1661,13 @@
             const positions = starPoints.geometry.attributes.position.array;
             const colors = starPoints.geometry.attributes.color.array;
             const sizes = starPoints.geometry.attributes.size.array;
-            const { twinkleSpeeds, originalY, rotationSpeeds } = starPoints.geometry.userData;
+            const { twinkleSpeeds, originalY, rotationSpeeds, glowIntensities } = starPoints.geometry.userData;
             
             const time = clock.elapsedTime;
             
             for (let i = 0; i < positions.length / 3; i++) {
                 // 上下浮动
-                const floatOffset = Math.sin(time * 0.5 + i * 0.1) * 0.8;
+                const floatOffset = Math.sin(time * 0.6 + i * 0.1) * 1.0;
                 positions[i * 3 + 1] = originalY[i] + floatOffset;
                 
                 // 轻微旋转运动
@@ -1488,17 +1678,19 @@
                 positions[i * 3 + 2] = x * Math.sin(angle) + z * Math.cos(angle);
                 
                 // 闪烁效果
-                const twinkle = Math.sin(time * twinkleSpeeds[i] * 1.5) * 0.5 + 0.5;
+                const twinkle1 = Math.sin(time * twinkleSpeeds[i] * CONFIG.effects.twinkleSpeed) * 0.5 + 0.5;
+                const twinkle2 = Math.sin(time * (twinkleSpeeds[i] * 0.7) + i) * 0.3 + 0.7;
+                const combinedTwinkle = (twinkle1 + twinkle2) / 2;
                 
-                // 更新颜色亮度
-                const brightness = 0.6 + twinkle * 0.4;
+                // 更新颜色亮度 - 更加鲜艳
+                const brightness = 0.7 + combinedTwinkle * 0.6;
                 colors[i * 3] *= brightness;
                 colors[i * 3 + 1] *= brightness;
                 colors[i * 3 + 2] *= brightness;
                 
                 // 更新大小
-                const sizeMultiplier = 0.5 + twinkle * 1.0;
-                sizes[i] = 0.1 * sizeMultiplier;
+                const sizeMultiplier = 0.4 + combinedTwinkle * 1.2;
+                sizes[i] = CONFIG.effects.starSize * sizeMultiplier * glowIntensities[i];
             }
             
             starPoints.geometry.attributes.position.needsUpdate = true;
